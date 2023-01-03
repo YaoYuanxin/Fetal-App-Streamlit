@@ -3,6 +3,7 @@ This file includes all the preprocess functions for input data.
 """
 import math
 import numpy as np
+import pandas as pd
 def efw19(bpd_mm,mad_mm,fl_mm):
     """
     calculates EFW from Empirical Formula 19,
@@ -35,3 +36,17 @@ def is_macro(y):
     “macrosomia”is used to describe the condition of 
     a fetus with a birth weight of more than 4000 g."""
     return y>4000
+
+def preprocess_for_RNN_new(df):
+  """
+  preprocess the data to be ready to use for RNN
+     @param df: the input dataframe
+  """
+  result = []
+  print("Preprocessing...")
+  for id in df.index.unique():
+    result.append(np.array(df[df.index == id].reset_index()['efw']).reshape(-1,))
+  print("Done.")
+  result = pd.DataFrame(result)
+  result = result.set_index(df.index.unique())
+  return result

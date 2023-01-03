@@ -10,13 +10,25 @@ import numpy as np
 from datetime import datetime    # use datetime to generate user_input id
 import deta_database as db       # local import of database
 from data_preprocess_utilities import *
-import sqlite3
+from database_app_sqlite3 import *
+import subprocess
+
+import matplotlib.pyplot as plt, mpld3
+plt.style.use('default')
+from mpld3 import plugins
+import streamlit.components.v1 as components
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_absolute_error
+from sklearn import metrics
+from keras.models import load_model
+
 
 # -------------- SETTINGS --------------
 page_title = "Fetal BirthWeight Prediction & LGA and Macrosomia Diagnosis"
 page_icon = ":chart_with_upwards_trend:"  # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 layout = "centered"
-input_id = datetime.today().strftime("%b-%d-%Y") + "__" + datetime.now().strftime("%H-%M-%S")
+input_id = datetime.today().strftime("%m%d%Y") + datetime.now().strftime("%H%M%S")
 
 mother_bios = ["Mother's Weight in **kg** Before Pregnancy",
                 "Mother's Height in **cm**",
@@ -28,54 +40,30 @@ mother_bios = ["Mother's Weight in **kg** Before Pregnancy",
 st.set_page_config(page_title=page_title, page_icon=page_icon, layout=layout)
 st.title(page_title + " " + page_icon)
 
-# --- DATABASE ENGINE FOR INPUT
-# --- SQLITE3 DATABASE SETUP
-# DataBase for Non-Sequential Input
-connection = sqlite3.connect("app_database.db")
-cursor = connection.cursor()
-cursor.execute('CREATE TABLE IF NOT EXISTS\
-                             non_sequential_input (wt_before_preg DOUBLE, height DOUBLE, NoPrevPreg NUMBER,\
-                                                    hpb NUMBER, cardiac NUMBER, baseline_diabetes NUMBER,\
-                                                    renal NUMBER, reg_smoke)')
-
-
-# DataBase for Sequential Input
-cursor.execute('CREATE TABLE IF NOT EXISTS\
-                            sequential_input (gadays NUMBER, efw DOUBLE)')
-
-
-connection.commit()
-
-# --- IMPORT ORIGINAL DATA
-
-covariates_5_record = pd.read_csv("Original Data/covariates_5_record.csv",index_col=0)
-no_covariate_no_na_clean = pd.read_csv("Original Data/no_covariate_no_na_clean.csv",index_col=0)
-
-covariates_5_record.set_index("id",inplace=True)
-no_covariate_no_na_clean.set_index("id",inplace=True)
-
-
-# --- PUT THE ORIGINAL DATA INTO THE DATABASES
-
-covariates_5_record.to_sql('non_sequential_input', connection, if_exists='replace', index = True)
-
-no_covariate_no_na_clean.to_sql('sequential_input', connection, if_exists='replace', index = True)
+st.markdown("""Some instructions for the app 🎈 R x Python Streamlit App""")
 
 
 
 
-# --- MOTHER'S INFORMATION INPUT FORM
-st.header(f"Enter Mother's Information and Health History:")
-with st.form("Mother's Information", clear_on_submit=True):
+
+
+
+
+
+# --- USER INPUT FORM
+
+with st.form("User Input (2 Forms)", clear_on_submit=True):
+    st.header(f"Enter Mother's Information and Health History:")
     def non_sequential_input():
         with st.expander("_Mother's Biographical Information_"):
             wt_before_preg = st.number_input(f"Mother's Weight in **kg** Before Pregnancy \
                                             (Default value is the database average at 59.18kg)",
-                                            min_value = 37.00,max_value=112.00, value=59.18)
+                                            min_value = 37.00,max_value=112.00, value=59.18, step=1.0)
+            
 
             height = st.number_input(f"Mother's Height in **cm** \
                                     (Default value is the database average at 165.95cm )", 
-                                    min_value = 147.00,max_value = 186.00, value = 165.95)
+                                    min_value = 147.00,max_value = 186.00, value = 165.95, step=1.0)
 
             NoPrevPreg = st.selectbox("Number of Previous Pregnancies", ("No previous pregancy.",
                                                                         "1 previous pregnancy.",
@@ -109,36 +97,25 @@ with st.form("Mother's Information", clear_on_submit=True):
         return non_sequential_input_df
 
     input_df_mom = non_sequential_input()
+    # st.subheader("***Mother's Information***")
+    # st.write("1 indicates 'yes' and 0 indicates 'no'.")
+    # st.write(input_df_mom)
 
-
-    submitted_non_sequential = st.form_submit_button("**Save Mother's Information**")
-
-    if submitted_non_sequential:
-        # DISPLAY and STORE Non-Sequential Input
-        st.subheader("***Mother's Information***")
-        st.write("1 indicates 'yes' and 0 indicates 'no'.")
-        st.dataframe(input_df_mom)
-        input_df_mom.to_sql('non_sequential_input', con=connection, if_exists='append',index=True)
-        st.success("Mother's Information saved!")
-        #input_df_mom.to_csv("output.csv")
-
-
-# --- ULTRASOUND INFO INPUT FORM 
-st.header("Enter Fetal Ultrasound Measurements:")
-with st.form("Ultrasound Measurements",clear_on_submit=True):
+    # --- FETAL ULTRASOUND MEASUREMENTS
+    st.header(f"Enter Fetal Ultrasound Measurements:")
     def sequential_input_17():
         with st.expander(f"Measurements at **~17th Week**"):
             gadays = st.number_input(f"**Exact Gestational Age Days**",
-                                        min_value = 84, max_value = 157, value = 122)
+                                        min_value = 84, max_value = 157, value = 122, step=1)
 
             bpd_mm = st.number_input(f"**Bipateral Diameter(BPD)** in milimeters",
-                                        min_value = 20.00, max_value = 62.00, value = 39.86)
+                                        min_value = 20.00, max_value = 62.00, value = 39.86, step=1.0)
 
             mad_mm = st.number_input("**Middle Abdominal Diameter(MAD)** in milimeters",
-                                         min_value = 20.00, max_value = 64.00, value = 37.91)
+                                         min_value = 20.00, max_value = 64.00, value = 37.91, step=1.0)
 
             fl_mm = st.number_input("**Femur Length(FL)** in milimeters",
-                                        min_value = 0.00, max_value = 47.00, value = 24.57)
+                                        min_value = 0.00, max_value = 47.00, value = 24.57, step=1.0)
 
         sequential_input_data_17 = {
             "gadays":gadays,
@@ -155,16 +132,16 @@ with st.form("Ultrasound Measurements",clear_on_submit=True):
     def sequential_input_25():
         with st.expander(f"Measurements at **~25th Week**"):
             gadays = st.number_input("**Exact Gestational Age Days**",
-                                        min_value = 158, max_value = 201, value = 175)
+                                        min_value = 158, max_value = 201, value = 175, step=1)
 
             bpd_mm = st.number_input("**Bipateral Diameter(BPD)** in milimeters",
-                                        min_value = 47.00, max_value = 96.00, value = 64.51)
+                                        min_value = 47.00, max_value = 96.00, value = 64.51, step=1.0)
 
             mad_mm = st.number_input("**Middle Abdominal Diameter(MAD)** in milimeters",
-                                          min_value = 50.00,max_value = 109.00, value = 64.84)
+                                          min_value = 50.00,max_value = 109.00, value = 64.84, step=1.0)
 
             fl_mm = st.number_input("**Femur Length(FL)** in milimeters",
-                                        min_value = 36.00, max_value = 71.00, value = 46.64)
+                                        min_value = 36.00, max_value = 71.00, value = 46.64, step=1.0)
 
         sequential_input_data_25 = {
             "gadays":gadays,
@@ -181,16 +158,16 @@ with st.form("Ultrasound Measurements",clear_on_submit=True):
     def sequential_input_33():
         with st.expander(f"Measurements at **~33rd Week**"):
             gadays = st.number_input("**Exact Gestational Age Days**",
-                                        min_value = 202, max_value = 246, value = 230)
+                                        min_value = 202, max_value = 246, value = 230, step=1)
 
             bpd_mm = st.number_input("**Bipateral Diameter(BPD)** in milimeters",
-                                        min_value = 66.00, max_value = 98.00, value = 85.95)
+                                        min_value = 66.00, max_value = 98.00, value = 85.95, step=1.0)
 
             mad_mm = st.number_input("**Middle Abdominal Diameter(MAD)** in milimeters",
-                                        min_value = 66.00, max_value = 111.00, value = 92.40)
+                                        min_value = 66.00, max_value = 111.00, value = 92.40, step=1.0)
 
             fl_mm = st.number_input("**Femur Length(FL)** in milimeters",
-                                        min_value = 47.00, max_value = 74.00, value = 64.14)
+                                        min_value = 47.00, max_value = 74.00, value = 64.14, step=1.0)
 
         sequential_input_data_33 = {
             "gadays":gadays,
@@ -207,16 +184,16 @@ with st.form("Ultrasound Measurements",clear_on_submit=True):
     def sequential_input_37():
         with st.expander(f"Measurements at **~37th Week**"):
             gadays = st.number_input("**Exact Gestational Age Days**",
-                                        min_value = 247, max_value = 276, value = 259)
+                                        min_value = 247, max_value = 276, value = 259, step=1)
 
             bpd_mm = st.number_input("**Bipateral Diameter(BPD)** in milimeters",
-                                          min_value = 78.00, max_value = 104.00, value = 92.97)
+                                          min_value = 78.00, max_value = 104.00, value = 92.97, step=1.0)
 
             mad_mm = st.number_input("**Middle Abdominal Diameter(MAD)** in milimeters",
-                                        min_value = 85.00, max_value = 124.00, value = 104.97)
+                                        min_value = 85.00, max_value = 124.00, value = 104.97, step=1.0)
 
             fl_mm = st.number_input("**Femur Length(FL)** in milimeters",
-                                        min_value = 52.00, max_value = 82.00, value = 71.51)
+                                        min_value = 52.00, max_value = 82.00, value = 71.51, step=1.0)
 
         sequential_input_data_37 = {
             "gadays":gadays,
@@ -247,12 +224,156 @@ with st.form("Ultrasound Measurements",clear_on_submit=True):
     sequential_input_all = sequential_input_all[["gadays","efw"]]
     sequential_input_all.insert(0,column="id", value=input_id)
     sequential_input_all.set_index("id", inplace = True)
-    submitted_sequential = st.form_submit_button("**Save Ultrasound Information**")
 
-    if submitted_sequential:
-        st.subheader("***Ultrasound Measurement Information***")
-        st.write("The fetus' ultrasound measurements over 4 gestational age time steps. hmmm")
-        st.dataframe(sequential_input_all)
-        sequential_input_all.to_sql('sequential_input', con=connection, if_exists='append',index=True)
-        st.success("Ultrasound Information saved!")
+
+
+    # DISPLAY and STORE User Input
+    # st.subheader("***Ultrasound Measurement Information***")
+    # st.write("The fetus' ultrasound measurements over 4 gestational age time steps. hmmm")
+    # st.dataframe(sequential_input_all)
+
+
+
+    submitted = st.form_submit_button("**Confirm and Save**")
+    if submitted:
+        input_df_mom.to_sql('non_sequential_input', con=connection_non_sequential, if_exists='append',index=True)
+        sequential_input_all.to_sql('sequential_input', con=connection_sequential, if_exists='append',index=True)
+        st.success("User input saved!")
+
+        process1 = subprocess.Popen(["Rscript", "test_r.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result1 = process1.communicate()
+        st.header("User input augmented and ready to use. DataBase is now working as intended")
+        
+        # Fetch the augmented data
+        cursor_sequential.execute('''  
+                            SELECT * FROM 'augmented_quad_df'
+                        ''')
+
+        augmented_data = pd.DataFrame(cursor_sequential.fetchall(), columns=["id","gadays","gadays_2","efw"])
+        augmented_data.set_index("id",inplace=True)
+
+
+        # Display the Augmented Data
+        st.write("**Displaying the Augmented Data.**")
+
+        fig, ax = plt.subplots()
+        ax.scatter(augmented_data.gadays, augmented_data.efw, c = 'b', label = "Augmented", alpha = 1 )
+        ax.scatter(no_covariate_no_na_clean.gadays,no_covariate_no_na_clean.efw, c = 'yellowgreen', label = "Original",alpha = 0.7 )
+
+
+        plt.xlabel("Gestational Age Days")
+        plt.ylabel("Estimated Fetal Weight")
+        plt.title("Augmented Data vs Original Data (Quadratic Model)")
+        plt.legend()
+        st.pyplot(fig)
+
+
+        # Ready the Augmented Data for RNN/LSTM
+        new_daily_time = np.linspace(84,301,301-84+1)
+        augmented_data_ready = preprocess_for_RNN_new(augmented_data)
+        augmented_data_ready.columns = new_daily_time
+        st.write(augmented_data_ready)
+        st.write("Preprocess successful")
+        
+        y_days = 53
+        n_features = 1
+        y = augmented_data_ready.iloc[:,-y_days:]
+        X = augmented_data_ready.drop(columns = y.columns)
+
+        
+        scaler_1 = StandardScaler()
+        X_scaled = scaler_1.fit_transform(X)
+        y_scaled = scaler_1.fit_transform(y)
+
+        X_scaled_pred = X_scaled[-1,:]
+        y_scaled_pred = y_scaled[-1,:]
+
+        X_scaled_pred = X_scaled_pred.reshape(X_scaled_pred.shape[0],n_features)
+        X_scaled_pred = X_scaled_pred.reshape(1,X_scaled_pred.shape[0],1)
+
+        covariates_5_record = pd.concat([covariates_5_record,input_df_mom],axis = 0)
+        scalar_2 = StandardScaler()
+        covariates_5_record.wt_before_preg = scalar_2.fit_transform(np.array(covariates_5_record.wt_before_preg).reshape(-1,1))
+        covariates_5_record.height = scalar_2.fit_transform(np.array(covariates_5_record.height).reshape(-1,1))
+        input_df_mom_standardized = covariates_5_record.iloc[-1]
+        input_df_mom_standardized = pd.DataFrame(input_df_mom_standardized).transpose()
+
+
+        # Import Pre-trained RNN/LSTM models 
+        model_qua_rnn_std_25 = load_model("/home/yuanxin/Fetal App Streamlit/model_qua_rnn_std_25.h5")
+
+        pred_y = model_qua_rnn_std_25.predict([X_scaled_pred,input_df_mom_standardized])
+        true_pred = scaler_1.inverse_transform(pred_y)
+        true_pred_df = pd.DataFrame(true_pred)
+        true_pred_df.columns = y.columns
+
+        df_90th_10th = pd.read_csv("/home/yuanxin/Fetal App Streamlit/df_90th_10th.csv",index_col=0)
+
+
+        lga_true = is_lga(true_pred_df,df_90th_10th)
+        macro_true = is_macro(true_pred_df)
+        lga_true.loc[0] = lga_true.loc[0].map({True: "Yes", False: "No"})
+        macro_true.loc[0] = macro_true.loc[0].map({True: "Yes", False: "No"})
+
+        st.write("Prediction Result")
+        result = pd.concat([true_pred_df,lga_true,macro_true],axis = 0)
+        result.insert(0, column = "Result", value = ["Predicted Birthweight", "LGA Diagnosis", "Macrosomia Diagnosis"])
+        result.set_index("Result",inplace=True)
+        st.write(result)
+
+
+        ## Interactive Plot 
+        lower_bound = float(result.columns[0])
+        upper_bound = float(result.columns[-1])
+        lga_limit_df = df_90th_10th.loc[((df_90th_10th["gadays"]>=lower_bound) & (df_90th_10th["gadays"]<=upper_bound))]
+
+        lga_fig = plt.figure(figsize=(5,5))
+        plt.plot(lga_limit_df["gadays"], lga_limit_df["90th percentile BW"],color='r', marker='.')
+        plt.plot(result.iloc[0].astype(float).index.astype('float'),result.iloc[0].values.astype('float'), color = 'b', marker = ',')
+
+
+        # Define some CSS to control our custom labels
+        css = '''
+        table
+        {
+        border-collapse: collapse;
+        }
+        th
+        {
+        color: #ffffff;
+        background-color: #000000;
+        }
+        td
+        {
+        background-color: #cccccc;
+        }
+        table, th, td
+        {
+        font-family:Arial, Helvetica, sans-serif;
+        border: 1px solid black;
+        text-align: right;
+        }
+        '''
+
+        for axes in lga_fig.axes:
+            for line in axes.get_lines():
+                xy_data = line.get_xydata()
+                labels = []
+                for x,y in xy_data:
+                    html_label = f'<table border="1" class="dataframe"> <thead> <tr style="text-align: right;"> </thead> <tbody> <tr> <th>x</th> <td>{x}</td> </tr> <tr> <th>y</th> <td>{y}</td> </tr> </tbody> </table>'
+                    labels.append(html_label)
+                tooltip = plugins.PointHTMLTooltip(line, labels, css=css)
+                plugins.connect(lga_fig, tooltip)
+
+        fig_html = mpld3.fig_to_html(lga_fig)
+        components.html(fig_html, height=500, width=500)
+
+                # Drop the Augmented Data from the DataBase
+        cursor_sequential.execute('''  
+                    DROP TABLE 'augmented_quad_df'
+                ''')
+        st.write("Ready to run again.")
+
+
+    
 
