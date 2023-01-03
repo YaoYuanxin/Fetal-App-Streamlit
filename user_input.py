@@ -24,13 +24,43 @@ mother_bios = ["Mother's Weight in **kg** Before Pregnancy",
 
 
 
-# --------------------------------------
-
+# -------PAGE SETTINGS
 st.set_page_config(page_title=page_title, page_icon=page_icon, layout=layout)
 st.title(page_title + " " + page_icon)
 
-
+# --- DATABASE ENGINE FOR INPUT
 # --- SQLITE3 DATABASE SETUP
+# DataBase for Non-Sequential Input
+connection = sqlite3.connect("app_database.db")
+cursor = connection.cursor()
+cursor.execute('CREATE TABLE IF NOT EXISTS\
+                             non_sequential_input (wt_before_preg DOUBLE, height DOUBLE, NoPrevPreg NUMBER,\
+                                                    hpb NUMBER, cardiac NUMBER, baseline_diabetes NUMBER,\
+                                                    renal NUMBER, reg_smoke)')
+
+
+# DataBase for Sequential Input
+cursor.execute('CREATE TABLE IF NOT EXISTS\
+                            sequential_input (gadays NUMBER, efw DOUBLE)')
+
+
+connection.commit()
+
+# --- IMPORT ORIGINAL DATA
+
+covariates_5_record = pd.read_csv("Original Data/covariates_5_record.csv",index_col=0)
+no_covariate_no_na_clean = pd.read_csv("Original Data/no_covariate_no_na_clean.csv",index_col=0)
+
+covariates_5_record.set_index("id",inplace=True)
+no_covariate_no_na_clean.set_index("id",inplace=True)
+
+
+# --- PUT THE ORIGINAL DATA INTO THE DATABASES
+
+covariates_5_record.to_sql('non_sequential_input', connection, if_exists='replace', index = True)
+
+no_covariate_no_na_clean.to_sql('sequential_input', connection, if_exists='replace', index = True)
+
 
 
 
@@ -72,23 +102,25 @@ with st.form("Mother's Information", clear_on_submit=True):
 
         non_sequential_input_df = pd.DataFrame(non_sequential_input_data, index=[0])
         non_sequential_input_df = non_sequential_input_df.replace({"Yes":1, "No":0})
-        non_sequential_input_df.insert(0,column="input id", value=input_id)
-        non_sequential_input_df.set_index("input id", inplace = True)
+        non_sequential_input_df.insert(0,column="id", value=input_id)
+        non_sequential_input_df.set_index("id", inplace = True)
         non_sequential_input_df = non_sequential_input_df.replace({"No previous pregancy.":1, "1 previous pregnancy.":1, 
                                         "2 or more previous pregnancies.":2})
         return non_sequential_input_df
 
     input_df_mom = non_sequential_input()
 
+
     submitted_non_sequential = st.form_submit_button("**Save Mother's Information**")
 
     if submitted_non_sequential:
-        # Display Non-Sequential Input
+        # DISPLAY and STORE Non-Sequential Input
         st.subheader("***Mother's Information***")
         st.write("1 indicates 'yes' and 0 indicates 'no'.")
-        db.store_non_sequential(input_df_mom.to_json())
         st.dataframe(input_df_mom)
+        input_df_mom.to_sql('non_sequential_input', con=connection, if_exists='append',index=True)
         st.success("Mother's Information saved!")
+        #input_df_mom.to_csv("output.csv")
 
 
 # --- ULTRASOUND INFO INPUT FORM 
@@ -213,11 +245,14 @@ with st.form("Ultrasound Measurements",clear_on_submit=True):
     sequential_input_all.insert(0, column = 'Gestational Week', value = gaweeks)
     sequential_input_all.set_index("Gestational Week", inplace=True)    
     sequential_input_all = sequential_input_all[["gadays","efw"]]
+    sequential_input_all.insert(0,column="id", value=input_id)
+    sequential_input_all.set_index("id", inplace = True)
     submitted_sequential = st.form_submit_button("**Save Ultrasound Information**")
 
     if submitted_sequential:
         st.subheader("***Ultrasound Measurement Information***")
         st.write("The fetus' ultrasound measurements over 4 gestational age time steps. hmmm")
         st.dataframe(sequential_input_all)
-        db.store_sequential(sequential_input_all.to_json())
+        sequential_input_all.to_sql('sequential_input', con=connection, if_exists='append',index=True)
         st.success("Ultrasound Information saved!")
+
