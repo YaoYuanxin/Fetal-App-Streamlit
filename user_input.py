@@ -329,6 +329,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
 
         lga_fig = plt.figure(figsize=(5,5))
         plt.plot(lga_limit_df["gadays"], lga_limit_df["90th percentile BW"],color='r', marker='.')
+        #plt.plot(np.linspace(248,301,200), np.repeat(4000,200), color = 'orange')
         plt.plot(result.iloc[0].astype(float).index.astype('float'),result.iloc[0].values.astype('float'), color = 'b', marker = ',')
 
 
@@ -360,7 +361,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
                 xy_data = line.get_xydata()
                 labels = []
                 for x,y in xy_data:
-                    html_label = f'<table border="1" class="dataframe"> <thead> <tr style="text-align: right;"> </thead> <tbody> <tr> <th>x</th> <td>{x}</td> </tr> <tr> <th>y</th> <td>{y}</td> </tr> </tbody> </table>'
+                    html_label = f'<table border="1" class="dataframe"> <thead> <tr style="text-align: right;"> </thead> <tbody> <tr> <th>x</th> <td>{"Gestational Age Day"}</td> </tr> <tr> <th>y</th> <td>{"Prodicted Fetal Weight"}</td> </tr> </tbody> </table>'
                     labels.append(html_label)
                 tooltip = plugins.PointHTMLTooltip(line, labels, css=css)
                 plugins.connect(lga_fig, tooltip)
