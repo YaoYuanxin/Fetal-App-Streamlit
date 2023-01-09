@@ -240,7 +240,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
         sequential_input_all.to_sql('sequential_input', con=connection_sequential, if_exists='append',index=True)
         st.success("Predictions generated! Displaying projected **fetal birthweight** and **overgrowth diagnosis**.")
 
-        process1 = subprocess.Popen(["Rscript", "test_r.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        process1 = subprocess.Popen(["test_r.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         result1 = process1.communicate()
         
         # Fetch the augmented data
