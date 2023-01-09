@@ -50,3 +50,16 @@ def preprocess_for_RNN_new(df):
   result = pd.DataFrame(result)
   result = result.set_index(df.index.unique())
   return result
+
+
+def display_color_df(value):
+  """
+  Make streamlit display different colors when the predicted
+    fetal birthweight has different dignoses
+
+  """
+  if value == "Yes":
+    color = "red"
+  else:
+    color = "blue"
+  return f'background-color: {color}'

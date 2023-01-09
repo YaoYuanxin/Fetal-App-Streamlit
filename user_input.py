@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt, mpld3
 plt.style.use('default')
 from mpld3 import plugins
 import streamlit.components.v1 as components
+import plotly_express as px
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error
@@ -40,7 +41,15 @@ mother_bios = ["Mother's Weight in **kg** Before Pregnancy",
 st.set_page_config(page_title=page_title, page_icon=page_icon, layout=layout)
 st.title(page_title + " " + page_icon)
 
-st.markdown("""Some instructions for the app 🎈 R x Python Streamlit App""")
+st.markdown("""
+:information_source: **Instructions**
+- Please fill out the entry forms below according to medical records or to the best of your knowledge. 
+    *Pay special attention to **entry units**.*
+
+- If one particular piece of information is missing, the system automatically replaces the missing entries with
+    the **DataBase average**.
+
+- The predicted fetal birthweights and overgrowth diagnosis are generated based on the study <*insert parper link*>""")
 
 
 
@@ -53,23 +62,21 @@ st.markdown("""Some instructions for the app 🎈 R x Python Streamlit App""")
 # --- USER INPUT FORM
 
 with st.form("User Input (2 Forms)", clear_on_submit=True):
-    st.header(f"Enter Mother's Information and Health History:")
+    st.header(f" :page_facing_up: Mother's Information:")
     def non_sequential_input():
-        with st.expander("_Mother's Biographical Information_"):
-            wt_before_preg = st.number_input(f"Mother's Weight in **kg** Before Pregnancy \
-                                            (Default value is the database average at 59.18kg)",
+        with st.expander("**Mother's Basic Information**"):
+            wt_before_preg = st.number_input(f"Mother's Weight in **kg** Before Pregnancy ",
                                             min_value = 37.00,max_value=112.00, value=59.18, step=1.0)
             
 
-            height = st.number_input(f"Mother's Height in **cm** \
-                                    (Default value is the database average at 165.95cm )", 
+            height = st.number_input(f"Mother's Height in **cm** ", 
                                     min_value = 147.00,max_value = 186.00, value = 165.95, step=1.0)
 
             NoPrevPreg = st.selectbox("Number of Previous Pregnancies", ("No previous pregancy.",
                                                                         "1 previous pregnancy.",
                                                                         "2 or more previous pregnancies."))
         
-        with st.expander("_Mother's Health History_"):
+        with st.expander("**Mother's Health History**"):
             hpb = st.selectbox('Does the mother have **High Blood Pressure**?',('Yes','No'))
             cardiac = st.selectbox('Does the mother have **Cardiac Diseases**?',('Yes','No'))
             baseline_diabetes = st.selectbox('Does the mother have **Diabetes**?',('Yes','No'))
@@ -102,7 +109,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
     # st.write(input_df_mom)
 
     # --- FETAL ULTRASOUND MEASUREMENTS
-    st.header(f"Enter Fetal Ultrasound Measurements:")
+    st.header(f":bar_chart: Fetal Ultrasound Measurements:")
     def sequential_input_17():
         with st.expander(f"Measurements at **~17th Week**"):
             gadays = st.number_input(f"**Exact Gestational Age Days**",
@@ -234,15 +241,14 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
 
 
 
-    submitted = st.form_submit_button("**Confirm and Save**")
+    submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
         input_df_mom.to_sql('non_sequential_input', con=connection_non_sequential, if_exists='append',index=True)
         sequential_input_all.to_sql('sequential_input', con=connection_sequential, if_exists='append',index=True)
-        st.success("User input saved!")
+        st.success("Predictions generated! Displaying projected **fetal birthweight** and **overgrowth diagnosis**.")
 
         process1 = subprocess.Popen(["Rscript", "test_r.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         result1 = process1.communicate()
-        st.header("User input augmented and ready to use. DataBase is now working as intended")
         
         # Fetch the augmented data
         cursor_sequential.execute('''  
@@ -254,26 +260,26 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
 
 
         # Display the Augmented Data
-        st.write("**Displaying the Augmented Data.**")
+        # st.write("**Displaying the Augmented Data.**")
 
-        fig, ax = plt.subplots()
-        ax.scatter(augmented_data.gadays, augmented_data.efw, c = 'b', label = "Augmented", alpha = 1 )
-        ax.scatter(no_covariate_no_na_clean.gadays,no_covariate_no_na_clean.efw, c = 'yellowgreen', label = "Original",alpha = 0.7 )
+        # fig, ax = plt.subplots()
+        # ax.scatter(augmented_data.gadays, augmented_data.efw, c = 'b', label = "Augmented", alpha = 1 )
+        # ax.scatter(no_covariate_no_na_clean.gadays,no_covariate_no_na_clean.efw, c = 'yellowgreen', label = "Original",alpha = 0.7 )
 
 
-        plt.xlabel("Gestational Age Days")
-        plt.ylabel("Estimated Fetal Weight")
-        plt.title("Augmented Data vs Original Data (Quadratic Model)")
-        plt.legend()
-        st.pyplot(fig)
+        # plt.xlabel("Gestational Age Days")
+        # plt.ylabel("Estimated Fetal Weight")
+        # plt.title("Augmented Data vs Original Data (Quadratic Model)")
+        # plt.legend()
+        # st.pyplot(fig)
 
 
         # Ready the Augmented Data for RNN/LSTM
         new_daily_time = np.linspace(84,301,301-84+1)
         augmented_data_ready = preprocess_for_RNN_new(augmented_data)
         augmented_data_ready.columns = new_daily_time
-        st.write(augmented_data_ready)
-        st.write("Preprocess successful")
+        # st.write(augmented_data_ready)
+        # st.write("Preprocess successful")
         
         y_days = 53
         n_features = 1
@@ -315,65 +321,98 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
         lga_true.loc[0] = lga_true.loc[0].map({True: "Yes", False: "No"})
         macro_true.loc[0] = macro_true.loc[0].map({True: "Yes", False: "No"})
 
-        st.write("Prediction Result")
+        st.header("Prediction Result")
         result = pd.concat([true_pred_df,lga_true,macro_true],axis = 0)
         result.insert(0, column = "Result", value = ["Predicted Birthweight", "LGA Diagnosis", "Macrosomia Diagnosis"])
         result.set_index("Result",inplace=True)
         st.write(result)
+        # st.dataframe(result.loc[["LGA Diagnosis", "Macrosomia Diagnosis"]].style.apply(display_color_df, axis = 1))
 
 
         ## Interactive Plot 
         lower_bound = float(result.columns[0])
         upper_bound = float(result.columns[-1])
         lga_limit_df = df_90th_10th.loc[((df_90th_10th["gadays"]>=lower_bound) & (df_90th_10th["gadays"]<=upper_bound))]
+        # st.write(lga_limit_df)
+        # lga_limit_df.to_csv("lga_limit_df.csv")
+        result_vert = result.transpose()
+        lga_limit_df = lga_limit_df.set_index("gadays")
+        result_vert.index =result_vert.index.astype("float64")
 
-        lga_fig = plt.figure(figsize=(5,5))
-        plt.plot(lga_limit_df["gadays"], lga_limit_df["90th percentile BW"],color='r', marker='.')
-        #plt.plot(np.linspace(248,301,200), np.repeat(4000,200), color = 'orange')
-        plt.plot(result.iloc[0].astype(float).index.astype('float'),result.iloc[0].values.astype('float'), color = 'b', marker = ',')
+        overall_result = pd.concat([result_vert,lga_limit_df],axis = 1)
+        overall_result["Predicted Birthweight"] = overall_result["Predicted Birthweight"].astype("float64")
+        overall_result["90th percentile BW"] = overall_result["90th percentile BW"].astype("float64")
+        overall_result["Macrosomoia Weight"] = 4000
+        overall_result.insert(0,column="Gestational Age Day", value = overall_result.index)
+        overall_result['Predicted Diagnosis'] = ''
+        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'No'),\
+                            'Predicted Diagnosis'] = 'Healthy'
+
+        overall_result.loc[(overall_result['LGA Diagnosis'] == 'Yes'), 'Predicted Diagnosis'] = 'LGA'
+        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes'), 'Predicted Diagnosis'] = 'Macrosomia'
 
 
-        # Define some CSS to control our custom labels
-        css = '''
-        table
-        {
-        border-collapse: collapse;
-        }
-        th
-        {
-        color: #ffffff;
-        background-color: #000000;
-        }
-        td
-        {
-        background-color: #cccccc;
-        }
-        table, th, td
-        {
-        font-family:Arial, Helvetica, sans-serif;
-        border: 1px solid black;
-        text-align: right;
-        }
-        '''
+        fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
+                        color = "Predicted Diagnosis", symbol = "Predicted Diagnosis")
 
-        for axes in lga_fig.axes:
-            for line in axes.get_lines():
-                xy_data = line.get_xydata()
-                labels = []
-                for x,y in xy_data:
-                    html_label = f'<table border="1" class="dataframe"> <thead> <tr style="text-align: right;"> </thead> <tbody> <tr> <th>x</th> <td>{"Gestational Age Day"}</td> </tr> <tr> <th>y</th> <td>{"Prodicted Fetal Weight"}</td> </tr> </tbody> </table>'
-                    labels.append(html_label)
-                tooltip = plugins.PointHTMLTooltip(line, labels, css=css)
-                plugins.connect(lga_fig, tooltip)
+        fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['90th percentile BW'], \
+                        mode = "lines", name  = "LGA Threshold")
 
-        fig_html = mpld3.fig_to_html(lga_fig)
-        components.html(fig_html, height=500, width=500)
+        fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['Macrosomoia Weight'],\
+                         mode = "lines", name  = "Macrosmoia Threshold")
+
+        fig.update_layout(width=1500, height=800,template="simple_white")
+        # Show plot 
+        st.plotly_chart(fig, use_container_width=True)
+
+        # lga_fig = plt.figure(figsize=(5,5))
+        # plt.plot(lga_limit_df["gadays"], lga_limit_df["90th percentile BW"],color='r', marker='.')
+        # #plt.plot(np.linspace(248,301,200), np.repeat(4000,200), color = 'orange')
+        # plt.plot(result.iloc[0].astype(float).index.astype('float'),result.iloc[0].values.astype('float'), color = 'b', marker = ',')
+        # # px.scatter(lga_limit_df, x = "gadays", y = "90th percentile BW")
+
+
+        # # Define some CSS to control our custom labels
+        # css = '''
+        # table
+        # {
+        # border-collapse: collapse;
+        # }
+        # th
+        # {
+        # color: #ffffff;
+        # background-color: #000000;
+        # }
+        # td
+        # {
+        # background-color: #cccccc;
+        # }
+        # table, th, td
+        # {
+        # font-family:Arial, Helvetica, sans-serif;
+        # border: 1px solid black;
+        # text-align: right;
+        # }
+        # '''
+
+        # for axes in lga_fig.axes:
+        #     for line in axes.get_lines():
+        #         xy_data = line.get_xydata()
+        #         labels = []
+        #         for x,y in xy_data:
+        #             html_label = f'<table border="1" class="dataframe"> <thead> <tr style="text-align: right;"> </thead> <tbody> <tr> <th>x</th> <td>{"Gestational Age Day"}</td> </tr> <tr> <th>y</th> <td>{"Prodicted Fetal Weight"}</td> </tr> </tbody> </table>'
+        #             labels.append(html_label)
+        #         tooltip = plugins.PointHTMLTooltip(line, labels, css=css)
+        #         plugins.connect(lga_fig, tooltip)
+
+        # fig_html = mpld3.fig_to_html(lga_fig)
+        # components.html(fig_html, height=500, width=500)
 
                 # Drop the Augmented Data from the DataBase
         cursor_sequential.execute('''  
                     DROP TABLE 'augmented_quad_df'
                 ''')
-        st.write("Ready to run again.")
+        # st.write("Ready to run again.")
 
 
     
