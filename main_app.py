@@ -4,7 +4,6 @@ Handles USER INPUT and store USER INPUT into database
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 import streamlit as st
-from streamlit_option_menu import option_menu 
 import pandas as pd
 import numpy as np
 from datetime import datetime    # use datetime to generate user_input id
