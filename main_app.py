@@ -10,9 +10,6 @@ from datetime import datetime    # use datetime to generate user_input id
 from data_preprocess_utilities import *
 from database_app_sqlite3 import *
 import subprocess
-
-import matplotlib.pyplot as plt
-plt.style.use('default')
 import plotly_express as px
 
 from sklearn.preprocessing import StandardScaler
