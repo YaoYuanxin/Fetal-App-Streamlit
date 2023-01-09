@@ -340,9 +340,13 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
         overall_result['Predicted Diagnosis'] = ''
         overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'No'),\
                             'Predicted Diagnosis'] = 'Healthy'
-
-        overall_result.loc[(overall_result['LGA Diagnosis'] == 'Yes'), 'Predicted Diagnosis'] = 'LGA'
-        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes'), 'Predicted Diagnosis'] = 'Macrosomia'
+        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'Yes'),\
+                            'Predicted Diagnosis'] = 'Both LGA and Macrosomia'
+        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'Yes'),\
+                            'Predicted Diagnosis'] = 'LGA'
+        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
+                            'Predicted Diagnosis'] = 'Macrosomia'
+        st.dataframe(overall_result)
 
 
         fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
