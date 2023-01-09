@@ -7,15 +7,12 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from datetime import datetime    # use datetime to generate user_input id
-import deta_database as db       # local import of database
 from data_preprocess_utilities import *
 from database_app_sqlite3 import *
 import subprocess
 
-import matplotlib.pyplot as plt, mpld3
+import matplotlib.pyplot as plt
 plt.style.use('default')
-from mpld3 import plugins
-import streamlit.components.v1 as components
 import plotly_express as px
 
 from sklearn.preprocessing import StandardScaler
