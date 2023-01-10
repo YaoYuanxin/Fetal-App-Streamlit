@@ -420,13 +420,6 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
         st.success("Predictions generated! Displaying projected **fetal birthweight** and **overgrowth diagnosis**.")
         st.write("Read to run again. _more instructions...._")
 
-    st.download_button(
-            "**Download Report**",
-            overall_result,
-            "file.csv",
-            "text/csv",
-            key='download-csv'
-            )
 
 
 
