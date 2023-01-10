@@ -414,7 +414,10 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
         cursor_sequential.execute('''  
                     DROP TABLE 'augmented_quad_df'
                 ''')
+        connection_non_sequential.close()
+        connection_sequential.close()
         st.write("Ready to run again.")
+
 
 
     
