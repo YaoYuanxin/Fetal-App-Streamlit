@@ -42,7 +42,9 @@ st.markdown("""
 - If one particular piece of information is missing, the system automatically replaces the missing entries with
     the **DataBase average**.
 
-- The predicted fetal birthweights and overgrowth diagnosis are generated based on the study <*insert parper link*>""")
+- The predicted fetal birthweights and overgrowth diagnosis are generated based on the study <*insert parper link*>
+
+- Feel free to adjust the entries and re-run the program to see different predictions.""")
 
 
 
@@ -54,7 +56,7 @@ st.markdown("""
 
 # --- USER INPUT FORM
 
-with st.form("User Input (2 Forms)", clear_on_submit=True):
+with st.form("User Input (2 Forms)", clear_on_submit=False):
     st.header(f" :page_facing_up: Mother's Information:")
     def non_sequential_input():
         with st.expander("**Mother's Basic Information**"):
