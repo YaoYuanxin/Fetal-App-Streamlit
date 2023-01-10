@@ -19,7 +19,7 @@ from keras.models import load_model
 
 
 # -------------- SETTINGS --------------
-page_title = "Fetal BirthWeight Prediction & LGA and Macrosomia Diagnosis"
+page_title = "Fetal BirthWeight Prediction & Overgrowth Diagnosis"
 page_icon = ":chart_with_upwards_trend:"  # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 layout = "centered"
 input_id = datetime.today().strftime("%m%d%Y") + datetime.now().strftime("%H%M%S")
@@ -238,7 +238,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
-        with st.spinner("Using AI and Machine Learning to generate results..."):
+        with st.spinner("Predicting Fetal Birthweight and Overgrowth..."):
 
             # Open DataBases ON SUBMISSION
 
@@ -362,11 +362,11 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             lga_true.loc[0] = lga_true.loc[0].map({True: "Yes", False: "No"})
             macro_true.loc[0] = macro_true.loc[0].map({True: "Yes", False: "No"})
 
-            st.header("Prediction Result")
+            st.header("Projected Fetal Birthweight and Overgrowth Diagnosis Report")
             result = pd.concat([true_pred_df,lga_true,macro_true],axis = 0)
             result.insert(0, column = "Result", value = ["Predicted Birthweight", "LGA Diagnosis", "Macrosomia Diagnosis"])
             result.set_index("Result",inplace=True)
-            st.write(result)
+            # st.write(result)
             # st.dataframe(result.loc[["LGA Diagnosis", "Macrosomia Diagnosis"]].style.apply(display_color_df, axis = 1))
 
 
@@ -395,6 +395,14 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
                                 'Predicted Diagnosis'] = 'Macrosomia'
             st.dataframe(overall_result)
+
+            st.download_button(
+                    "**Download Report**",
+                    overall_result,
+                    "file.csv",
+                    "text/csv",
+                    key='download-csv'
+                    )
 
 
             fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
