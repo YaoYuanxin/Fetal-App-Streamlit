@@ -3,4 +3,3 @@ r-base-dev
 r-cran-caret
 r-cran-nlme
 r-cran-readr
-RSQLite
