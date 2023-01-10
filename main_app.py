@@ -238,184 +238,187 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
+        with st.spinner("Using AI and Machine Learning to generate results..."):
 
-        # Open DataBases ON SUBMISSION
+            # Open DataBases ON SUBMISSION
 
-        # --- SQLITE3 DATABASE SETUP
-        # DataBase for Non-Sequential Input
-        connection_non_sequential = sqlite3.connect("non_sequential.db")
-        cursor_non_sequential = connection_non_sequential.cursor()
-        cursor_non_sequential.execute('CREATE TABLE IF NOT EXISTS\
-                                    non_sequential_input (wt_before_preg DOUBLE, height DOUBLE, NoPrevPreg NUMBER,\
-                                                            hpb NUMBER, cardiac NUMBER, baseline_diabetes NUMBER,\
-                                                            renal NUMBER, reg_smoke)')
+            # --- SQLITE3 DATABASE SETUP
+            # DataBase for Non-Sequential Input
+            connection_non_sequential = sqlite3.connect("non_sequential.db")
+            cursor_non_sequential = connection_non_sequential.cursor()
+            cursor_non_sequential.execute('CREATE TABLE IF NOT EXISTS\
+                                        non_sequential_input (wt_before_preg DOUBLE, height DOUBLE, NoPrevPreg NUMBER,\
+                                                                hpb NUMBER, cardiac NUMBER, baseline_diabetes NUMBER,\
+                                                                renal NUMBER, reg_smoke)')
 
-        connection_non_sequential.commit()
-
-
-
-        # --- IMPORT ORIGINAL DATA
-
-        covariates_5_record = pd.read_csv("Original Data/covariates_5_record.csv",index_col=0)
-        no_covariate_no_na_clean = pd.read_csv("Original Data/no_covariate_no_na_clean.csv",index_col=0)
-
-        covariates_5_record.set_index("id",inplace=True)
-        no_covariate_no_na_clean.set_index("id",inplace=True)
-
-
-        # --- PUT THE ORIGINAL DATA INTO THE DATABASES
-
-        covariates_5_record.to_sql('non_sequential_input', connection_non_sequential, if_exists='replace', index = True)
-
-
-        # DataBase for Sequential Input
-        connection_sequential = sqlite3.connect("sequential.db")
-        cursor_sequential = connection_sequential.cursor()
-        cursor_sequential.execute('CREATE TABLE IF NOT EXISTS\
-                                    sequential_input (gadays NUMBER, efw DOUBLE)')
-
-
-        connection_sequential.commit()
-        no_covariate_no_na_clean.to_sql('sequential_input', connection_sequential, if_exists='replace', index = True)
+            connection_non_sequential.commit()
 
 
 
-        
-        input_df_mom.to_sql('non_sequential_input', con=connection_non_sequential, if_exists='append',index=True)
-        sequential_input_all.to_sql('sequential_input', con=connection_sequential, if_exists='append',index=True)
+            # --- IMPORT ORIGINAL DATA
+
+            covariates_5_record = pd.read_csv("Original Data/covariates_5_record.csv",index_col=0)
+            no_covariate_no_na_clean = pd.read_csv("Original Data/no_covariate_no_na_clean.csv",index_col=0)
+
+            covariates_5_record.set_index("id",inplace=True)
+            no_covariate_no_na_clean.set_index("id",inplace=True)
+
+
+            # --- PUT THE ORIGINAL DATA INTO THE DATABASES
+
+            covariates_5_record.to_sql('non_sequential_input', connection_non_sequential, if_exists='replace', index = True)
+
+
+            # DataBase for Sequential Input
+            connection_sequential = sqlite3.connect("sequential.db")
+            cursor_sequential = connection_sequential.cursor()
+            cursor_sequential.execute('CREATE TABLE IF NOT EXISTS\
+                                        sequential_input (gadays NUMBER, efw DOUBLE)')
+
+
+            connection_sequential.commit()
+            no_covariate_no_na_clean.to_sql('sequential_input', connection_sequential, if_exists='replace', index = True)
+
+
+
+            
+            input_df_mom.to_sql('non_sequential_input', con=connection_non_sequential, if_exists='append',index=True)
+            sequential_input_all.to_sql('sequential_input', con=connection_sequential, if_exists='append',index=True)
+            
+
+            
+            
+            process1 = subprocess.Popen(['Rscript', "test_r.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            result1 = process1.communicate()
+            
+            # Fetch the augmented data
+            cursor_sequential.execute('''  
+                                SELECT * FROM 'augmented_quad_df'
+                            ''')
+
+            augmented_data = pd.DataFrame(cursor_sequential.fetchall(), columns=["id","gadays","gadays_2","efw"])
+            augmented_data.set_index("id",inplace=True)
+
+
+            # Display the Augmented Data
+            # st.write("**Displaying the Augmented Data.**")
+
+            # fig, ax = plt.subplots()
+            # ax.scatter(augmented_data.gadays, augmented_data.efw, c = 'b', label = "Augmented", alpha = 1 )
+            # ax.scatter(no_covariate_no_na_clean.gadays,no_covariate_no_na_clean.efw, c = 'yellowgreen', label = "Original",alpha = 0.7 )
+
+
+            # plt.xlabel("Gestational Age Days")
+            # plt.ylabel("Estimated Fetal Weight")
+            # plt.title("Augmented Data vs Original Data (Quadratic Model)")
+            # plt.legend()
+            # st.pyplot(fig)
+
+
+            # Ready the Augmented Data for RNN/LSTM
+            new_daily_time = np.linspace(84,301,301-84+1)
+            augmented_data_ready = preprocess_for_RNN_new(augmented_data)
+            augmented_data_ready.columns = new_daily_time
+            # st.write(augmented_data_ready)
+            # st.write("Preprocess successful")
+            
+            y_days = 53
+            n_features = 1
+            y = augmented_data_ready.iloc[:,-y_days:]
+            X = augmented_data_ready.drop(columns = y.columns)
+
+            
+            scaler_1 = StandardScaler()
+            X_scaled = scaler_1.fit_transform(X)
+            y_scaled = scaler_1.fit_transform(y)
+
+            X_scaled_pred = X_scaled[-1,:]
+            y_scaled_pred = y_scaled[-1,:]
+
+            X_scaled_pred = X_scaled_pred.reshape(X_scaled_pred.shape[0],n_features)
+            X_scaled_pred = X_scaled_pred.reshape(1,X_scaled_pred.shape[0],1)
+
+            covariates_5_record = pd.concat([covariates_5_record,input_df_mom],axis = 0)
+            scalar_2 = StandardScaler()
+            covariates_5_record.wt_before_preg = scalar_2.fit_transform(np.array(covariates_5_record.wt_before_preg).reshape(-1,1))
+            covariates_5_record.height = scalar_2.fit_transform(np.array(covariates_5_record.height).reshape(-1,1))
+            input_df_mom_standardized = covariates_5_record.iloc[-1]
+            input_df_mom_standardized = pd.DataFrame(input_df_mom_standardized).transpose()
+
+
+            # Import Pre-trained RNN/LSTM models 
+            
+            model_qua_rnn_std_25 = load_model("model_qua_rnn_std_25.h5")
+            pred_y = model_qua_rnn_std_25.predict([X_scaled_pred,input_df_mom_standardized])
+            true_pred = scaler_1.inverse_transform(pred_y)
+            true_pred_df = pd.DataFrame(true_pred)
+            true_pred_df.columns = y.columns
+
+            df_90th_10th = pd.read_csv("df_90th_10th.csv",index_col=0)
+
+
+            lga_true = is_lga(true_pred_df,df_90th_10th)
+            macro_true = is_macro(true_pred_df)
+            lga_true.loc[0] = lga_true.loc[0].map({True: "Yes", False: "No"})
+            macro_true.loc[0] = macro_true.loc[0].map({True: "Yes", False: "No"})
+
+            st.header("Prediction Result")
+            result = pd.concat([true_pred_df,lga_true,macro_true],axis = 0)
+            result.insert(0, column = "Result", value = ["Predicted Birthweight", "LGA Diagnosis", "Macrosomia Diagnosis"])
+            result.set_index("Result",inplace=True)
+            st.write(result)
+            # st.dataframe(result.loc[["LGA Diagnosis", "Macrosomia Diagnosis"]].style.apply(display_color_df, axis = 1))
+
+
+            ## Interactive Plot 
+            lower_bound = float(result.columns[0])
+            upper_bound = float(result.columns[-1])
+            lga_limit_df = df_90th_10th.loc[((df_90th_10th["gadays"]>=lower_bound) & (df_90th_10th["gadays"]<=upper_bound))]
+            # st.write(lga_limit_df)
+            # lga_limit_df.to_csv("lga_limit_df.csv")
+            result_vert = result.transpose()
+            lga_limit_df = lga_limit_df.set_index("gadays")
+            result_vert.index =result_vert.index.astype("float64")
+
+            overall_result = pd.concat([result_vert,lga_limit_df],axis = 1)
+            overall_result["Predicted Birthweight"] = overall_result["Predicted Birthweight"].astype("float64")
+            overall_result["90th percentile BW"] = overall_result["90th percentile BW"].astype("float64")
+            overall_result["Macrosomoia Weight"] = 4000
+            overall_result.insert(0,column="Gestational Age Day", value = overall_result.index)
+            overall_result['Predicted Diagnosis'] = ''
+            overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'No'),\
+                                'Predicted Diagnosis'] = 'Healthy'
+            overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'Yes'),\
+                                'Predicted Diagnosis'] = 'Both LGA and Macrosomia'
+            overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'Yes'),\
+                                'Predicted Diagnosis'] = 'LGA'
+            overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
+                                'Predicted Diagnosis'] = 'Macrosomia'
+            st.dataframe(overall_result)
+
+
+            fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
+                            color = "Predicted Diagnosis", symbol = "Predicted Diagnosis")
+
+            fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['90th percentile BW'], \
+                            mode = "lines", name  = "LGA Threshold")
+
+            fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['Macrosomoia Weight'],\
+                            mode = "lines", name  = "Macrosmoia Threshold")
+
+            fig.update_layout(width=1500, height=800,template="simple_white")
+            # Show plot 
+            st.plotly_chart(fig, use_container_width=True)
+
+                    # Drop the Augmented Data from the DataBase
+            cursor_sequential.execute('''  
+                        DROP TABLE 'augmented_quad_df'
+                    ''')
+            connection_non_sequential.close()
+            connection_sequential.close()
+
         st.success("Predictions generated! Displaying projected **fetal birthweight** and **overgrowth diagnosis**.")
-
-        
-        
-        process1 = subprocess.Popen(['Rscript', "test_r.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        result1 = process1.communicate()
-        
-        # Fetch the augmented data
-        cursor_sequential.execute('''  
-                            SELECT * FROM 'augmented_quad_df'
-                        ''')
-
-        augmented_data = pd.DataFrame(cursor_sequential.fetchall(), columns=["id","gadays","gadays_2","efw"])
-        augmented_data.set_index("id",inplace=True)
-
-
-        # Display the Augmented Data
-        # st.write("**Displaying the Augmented Data.**")
-
-        # fig, ax = plt.subplots()
-        # ax.scatter(augmented_data.gadays, augmented_data.efw, c = 'b', label = "Augmented", alpha = 1 )
-        # ax.scatter(no_covariate_no_na_clean.gadays,no_covariate_no_na_clean.efw, c = 'yellowgreen', label = "Original",alpha = 0.7 )
-
-
-        # plt.xlabel("Gestational Age Days")
-        # plt.ylabel("Estimated Fetal Weight")
-        # plt.title("Augmented Data vs Original Data (Quadratic Model)")
-        # plt.legend()
-        # st.pyplot(fig)
-
-
-        # Ready the Augmented Data for RNN/LSTM
-        new_daily_time = np.linspace(84,301,301-84+1)
-        augmented_data_ready = preprocess_for_RNN_new(augmented_data)
-        augmented_data_ready.columns = new_daily_time
-        # st.write(augmented_data_ready)
-        # st.write("Preprocess successful")
-        
-        y_days = 53
-        n_features = 1
-        y = augmented_data_ready.iloc[:,-y_days:]
-        X = augmented_data_ready.drop(columns = y.columns)
-
-        
-        scaler_1 = StandardScaler()
-        X_scaled = scaler_1.fit_transform(X)
-        y_scaled = scaler_1.fit_transform(y)
-
-        X_scaled_pred = X_scaled[-1,:]
-        y_scaled_pred = y_scaled[-1,:]
-
-        X_scaled_pred = X_scaled_pred.reshape(X_scaled_pred.shape[0],n_features)
-        X_scaled_pred = X_scaled_pred.reshape(1,X_scaled_pred.shape[0],1)
-
-        covariates_5_record = pd.concat([covariates_5_record,input_df_mom],axis = 0)
-        scalar_2 = StandardScaler()
-        covariates_5_record.wt_before_preg = scalar_2.fit_transform(np.array(covariates_5_record.wt_before_preg).reshape(-1,1))
-        covariates_5_record.height = scalar_2.fit_transform(np.array(covariates_5_record.height).reshape(-1,1))
-        input_df_mom_standardized = covariates_5_record.iloc[-1]
-        input_df_mom_standardized = pd.DataFrame(input_df_mom_standardized).transpose()
-
-
-        # Import Pre-trained RNN/LSTM models 
-        
-        model_qua_rnn_std_25 = load_model("model_qua_rnn_std_25.h5")
-        pred_y = model_qua_rnn_std_25.predict([X_scaled_pred,input_df_mom_standardized])
-        true_pred = scaler_1.inverse_transform(pred_y)
-        true_pred_df = pd.DataFrame(true_pred)
-        true_pred_df.columns = y.columns
-
-        df_90th_10th = pd.read_csv("df_90th_10th.csv",index_col=0)
-
-
-        lga_true = is_lga(true_pred_df,df_90th_10th)
-        macro_true = is_macro(true_pred_df)
-        lga_true.loc[0] = lga_true.loc[0].map({True: "Yes", False: "No"})
-        macro_true.loc[0] = macro_true.loc[0].map({True: "Yes", False: "No"})
-
-        st.header("Prediction Result")
-        result = pd.concat([true_pred_df,lga_true,macro_true],axis = 0)
-        result.insert(0, column = "Result", value = ["Predicted Birthweight", "LGA Diagnosis", "Macrosomia Diagnosis"])
-        result.set_index("Result",inplace=True)
-        st.write(result)
-        # st.dataframe(result.loc[["LGA Diagnosis", "Macrosomia Diagnosis"]].style.apply(display_color_df, axis = 1))
-
-
-        ## Interactive Plot 
-        lower_bound = float(result.columns[0])
-        upper_bound = float(result.columns[-1])
-        lga_limit_df = df_90th_10th.loc[((df_90th_10th["gadays"]>=lower_bound) & (df_90th_10th["gadays"]<=upper_bound))]
-        # st.write(lga_limit_df)
-        # lga_limit_df.to_csv("lga_limit_df.csv")
-        result_vert = result.transpose()
-        lga_limit_df = lga_limit_df.set_index("gadays")
-        result_vert.index =result_vert.index.astype("float64")
-
-        overall_result = pd.concat([result_vert,lga_limit_df],axis = 1)
-        overall_result["Predicted Birthweight"] = overall_result["Predicted Birthweight"].astype("float64")
-        overall_result["90th percentile BW"] = overall_result["90th percentile BW"].astype("float64")
-        overall_result["Macrosomoia Weight"] = 4000
-        overall_result.insert(0,column="Gestational Age Day", value = overall_result.index)
-        overall_result['Predicted Diagnosis'] = ''
-        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'No'),\
-                            'Predicted Diagnosis'] = 'Healthy'
-        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'Yes'),\
-                            'Predicted Diagnosis'] = 'Both LGA and Macrosomia'
-        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'Yes'),\
-                            'Predicted Diagnosis'] = 'LGA'
-        overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
-                            'Predicted Diagnosis'] = 'Macrosomia'
-        st.dataframe(overall_result)
-
-
-        fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
-                        color = "Predicted Diagnosis", symbol = "Predicted Diagnosis")
-
-        fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['90th percentile BW'], \
-                        mode = "lines", name  = "LGA Threshold")
-
-        fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['Macrosomoia Weight'],\
-                         mode = "lines", name  = "Macrosmoia Threshold")
-
-        fig.update_layout(width=1500, height=800,template="simple_white")
-        # Show plot 
-        st.plotly_chart(fig, use_container_width=True)
-
-                # Drop the Augmented Data from the DataBase
-        cursor_sequential.execute('''  
-                    DROP TABLE 'augmented_quad_df'
-                ''')
-        connection_non_sequential.close()
-        connection_sequential.close()
-        st.write("Ready to run again.")
+        st.write("Read to run again. _more instructions...._")
 
 
 
