@@ -8,9 +8,9 @@ import pandas as pd
 import numpy as np
 from datetime import datetime    # use datetime to generate user_input id
 from data_preprocess_utilities import *
-from database_app_sqlite3 import *
 import subprocess
 import plotly_express as px
+import sqlite3
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error
@@ -238,7 +238,49 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
-        model_qua_rnn_std_25 = load_model("model_qua_rnn_std_25.h5")
+
+        # Open DataBases ON SUBMISSION
+
+        # --- SQLITE3 DATABASE SETUP
+        # DataBase for Non-Sequential Input
+        connection_non_sequential = sqlite3.connect("non_sequential.db")
+        cursor_non_sequential = connection_non_sequential.cursor()
+        cursor_non_sequential.execute('CREATE TABLE IF NOT EXISTS\
+                                    non_sequential_input (wt_before_preg DOUBLE, height DOUBLE, NoPrevPreg NUMBER,\
+                                                            hpb NUMBER, cardiac NUMBER, baseline_diabetes NUMBER,\
+                                                            renal NUMBER, reg_smoke)')
+
+        connection_non_sequential.commit()
+
+
+
+        # --- IMPORT ORIGINAL DATA
+
+        covariates_5_record = pd.read_csv("Original Data/covariates_5_record.csv",index_col=0)
+        no_covariate_no_na_clean = pd.read_csv("Original Data/no_covariate_no_na_clean.csv",index_col=0)
+
+        covariates_5_record.set_index("id",inplace=True)
+        no_covariate_no_na_clean.set_index("id",inplace=True)
+
+
+        # --- PUT THE ORIGINAL DATA INTO THE DATABASES
+
+        covariates_5_record.to_sql('non_sequential_input', connection_non_sequential, if_exists='replace', index = True)
+
+
+        # DataBase for Sequential Input
+        connection_sequential = sqlite3.connect("sequential.db")
+        cursor_sequential = connection_sequential.cursor()
+        cursor_sequential.execute('CREATE TABLE IF NOT EXISTS\
+                                    sequential_input (gadays NUMBER, efw DOUBLE)')
+
+
+        connection_sequential.commit()
+        no_covariate_no_na_clean.to_sql('sequential_input', connection_sequential, if_exists='replace', index = True)
+
+
+
+        
         input_df_mom.to_sql('non_sequential_input', con=connection_non_sequential, if_exists='append',index=True)
         sequential_input_all.to_sql('sequential_input', con=connection_sequential, if_exists='append',index=True)
         st.success("Predictions generated! Displaying projected **fetal birthweight** and **overgrowth diagnosis**.")
@@ -305,7 +347,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
         # Import Pre-trained RNN/LSTM models 
         
-
+        model_qua_rnn_std_25 = load_model("model_qua_rnn_std_25.h5")
         pred_y = model_qua_rnn_std_25.predict([X_scaled_pred,input_df_mom_standardized])
         true_pred = scaler_1.inverse_transform(pred_y)
         true_pred_df = pd.DataFrame(true_pred)
@@ -366,49 +408,6 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
         fig.update_layout(width=1500, height=800,template="simple_white")
         # Show plot 
         st.plotly_chart(fig, use_container_width=True)
-
-        # lga_fig = plt.figure(figsize=(5,5))
-        # plt.plot(lga_limit_df["gadays"], lga_limit_df["90th percentile BW"],color='r', marker='.')
-        # #plt.plot(np.linspace(248,301,200), np.repeat(4000,200), color = 'orange')
-        # plt.plot(result.iloc[0].astype(float).index.astype('float'),result.iloc[0].values.astype('float'), color = 'b', marker = ',')
-        # # px.scatter(lga_limit_df, x = "gadays", y = "90th percentile BW")
-
-
-        # # Define some CSS to control our custom labels
-        # css = '''
-        # table
-        # {
-        # border-collapse: collapse;
-        # }
-        # th
-        # {
-        # color: #ffffff;
-        # background-color: #000000;
-        # }
-        # td
-        # {
-        # background-color: #cccccc;
-        # }
-        # table, th, td
-        # {
-        # font-family:Arial, Helvetica, sans-serif;
-        # border: 1px solid black;
-        # text-align: right;
-        # }
-        # '''
-
-        # for axes in lga_fig.axes:
-        #     for line in axes.get_lines():
-        #         xy_data = line.get_xydata()
-        #         labels = []
-        #         for x,y in xy_data:
-        #             html_label = f'<table border="1" class="dataframe"> <thead> <tr style="text-align: right;"> </thead> <tbody> <tr> <th>x</th> <td>{"Gestational Age Day"}</td> </tr> <tr> <th>y</th> <td>{"Prodicted Fetal Weight"}</td> </tr> </tbody> </table>'
-        #             labels.append(html_label)
-        #         tooltip = plugins.PointHTMLTooltip(line, labels, css=css)
-        #         plugins.connect(lga_fig, tooltip)
-
-        # fig_html = mpld3.fig_to_html(lga_fig)
-        # components.html(fig_html, height=500, width=500)
 
                 # Drop the Augmented Data from the DataBase
         cursor_sequential.execute('''  
