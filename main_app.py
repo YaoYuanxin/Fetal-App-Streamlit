@@ -236,12 +236,13 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
+        model_qua_rnn_std_25 = load_model("model_qua_rnn_std_25.h5")
         input_df_mom.to_sql('non_sequential_input', con=connection_non_sequential, if_exists='append',index=True)
         sequential_input_all.to_sql('sequential_input', con=connection_sequential, if_exists='append',index=True)
         st.success("Predictions generated! Displaying projected **fetal birthweight** and **overgrowth diagnosis**.")
 
         
-        model_qua_rnn_std_25 = load_model("model_qua_rnn_std_25.h5")
+        
         process1 = subprocess.Popen(["Rscript", "test_r.R"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         result1 = process1.communicate()
         
