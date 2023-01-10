@@ -411,7 +411,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=True):
         cursor_sequential.execute('''  
                     DROP TABLE 'augmented_quad_df'
                 ''')
-        # st.write("Ready to run again.")
+        st.write("Ready to run again.")
 
 
     
