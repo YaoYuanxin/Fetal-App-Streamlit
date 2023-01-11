@@ -410,14 +410,15 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'Yes'),\
                                 'Predicted Diagnosis'] = 'LGA'
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
-                                'Predicted Diagnosis'] = 'Macrosomia'                          
+                                'Predicted Diagnosis'] = 'Macrosomia'        
+            overall_result["90th percentile BW"] = overall_result["90th percentile BW"].astype("float64")                  
             st.dataframe(overall_result)
 
 
             fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
                             color = "Predicted Diagnosis", symbol = "Predicted Diagnosis")
 
-            fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result["90th percentile BW"], \
+            fig.add_scatter(x= overall_result["Gestational Age Day"], y= overall_result["90th percentile BW"], \
                             mode = "lines", name  = "LGA Threshold")
 
             fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['Macrosomoia Weight'],\
