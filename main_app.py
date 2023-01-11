@@ -410,7 +410,8 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'Yes'),\
                                 'Predicted Diagnosis'] = 'LGA'
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
-                                'Predicted Diagnosis'] = 'Macrosomia'                         
+                                'Predicted Diagnosis'] = 'Macrosomia' 
+            overall_result = overall_result.round(2)                                            
             st.dataframe(overall_result)
 
 
