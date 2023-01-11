@@ -410,11 +410,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'Yes'),\
                                 'Predicted Diagnosis'] = 'LGA'
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
-                                'Predicted Diagnosis'] = 'Macrosomia'
-            overall_result.rename(columns = {"Predicted Birthweight": "Predicted Birthweight (in grams)",\
-                                            "90th percentile BW": "90th percentile BW (in grams)"})
-            overall_result = overall_result.drop("10th percentile BW",axis=1)  
-            overall_result = overall_result.round(2)                            
+                                'Predicted Diagnosis'] = 'Macrosomia'                          
             st.dataframe(overall_result)
 
 
