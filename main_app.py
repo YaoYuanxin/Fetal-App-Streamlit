@@ -411,7 +411,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
                                 'Predicted Diagnosis'] = 'LGA'
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
                                 'Predicted Diagnosis'] = 'Macrosomia'                                            
-            st.dataframe(overall_result.style.format("{:.2%}"))
+            st.dataframe(overall_result)
 
 
             fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
