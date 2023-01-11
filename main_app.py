@@ -410,8 +410,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'Yes'),\
                                 'Predicted Diagnosis'] = 'LGA'
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
-                                'Predicted Diagnosis'] = 'Macrosomia'        
-            overall_result["90th percentile BW"] = overall_result["90th percentile BW"].astype("float64")                  
+                                'Predicted Diagnosis'] = 'Macrosomia'                         
             st.dataframe(overall_result)
 
 
