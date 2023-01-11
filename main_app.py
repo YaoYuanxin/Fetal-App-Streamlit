@@ -414,10 +414,10 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             st.dataframe(overall_result)
 
 
-            fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight (in grams)"], \
+            fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
                             color = "Predicted Diagnosis", symbol = "Predicted Diagnosis")
 
-            fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result["90th percentile BW (in grams)"], \
+            fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result["90th percentile BW"], \
                             mode = "lines", name  = "LGA Threshold")
 
             fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['Macrosomoia Weight'],\
