@@ -36,31 +36,31 @@ st.title(page_title + " " + page_icon)
 
 st.markdown("""
 
-:information_source: _:blue[Our Purpose]_:
+:information_source: **_:Purple[Our Purpose]_:**
 
-**:red[Macrosomia]** refers to a fetus that has a weight of over 4000 grams at birth, regardless of how far along in the pregnancy it is. 
-It is sometimes mistaken for **:red["large for gestational age" (LGA)]**, which means an infant's birth weight is in the top 10% for their 
-gestational age. Both macrosomia and LGA increase the risk of health problems for the mother and baby during childbirth.
+**:red[Macrosomia]** refers to a fetus that has a weight of **over 4000** grams at birth, regardless of how far along in the pregnancy it is. 
+It is sometimes mistaken for **:red["large for gestational age" (LGA)]**, which means an infant's birth weight is in the **top 10% for their 
+gestational age**. Both macrosomia and LGA increase the risk of health problems for the mother and baby during childbirth.
 
 As a result, correctly identifying and predicting these conditions is a primary focus of obstetric research,
 in order to implement early intervention or specific medical care during childbirth, which will decrease the risks.
 
 :wrench: **Instructions for Our Tool** 
 
-- Our tool is powered by Aritifical Neural Networks, developed in the study <*insert parper link*>. Our latest accuracy for predicting
-    **:red[LGA]** is **94.7%**, with **66.7%** true positive rate; and our latest accuracy for predicting **:red[macrosomia]** is **84%**, 
-    with **96.8%** true positive rate.
+- Our tool is powered by Aritifical Neural Networks, developed in the study <*insert parper link*>. Our latest _accuracy_ for predicting
+    **:red[LGA]** is **94.7%**, with **66.7%** _true positive rate_; and our latest _accuracy_ for predicting **:red[macrosomia]** is **84%**, 
+    with **96.8%** _true positive rate_.
 
 - Please fill out the entry forms below according to medical records or to the best of your knowledge. 
     *Pay special attention to **entry units**.*
 
 - If one particular piece of information is missing, the system automatically replaces the missing entries with
-    the most representative value from the **DataBase**.
+    the most representative value from the database.
 
 - Typical Ultrasound Measurements are recorded in **4 periods**: around the **17th, 25th, 33rd, 37th** week of gestation,
     please enter them accordingly. If more than the aforementioned 4 periods are available, please choose the most accuate 4 measurements
     over these periods. If the complete records are not available, our system will fill it with the most representative value from
-    the DataBase.
+    the database.
 """)
 
 
