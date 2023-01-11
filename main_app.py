@@ -54,7 +54,7 @@ in order to implement early intervention or specific medical care during childbi
 - Please fill out the entry forms below according to medical records or to the best of your knowledge. 
     *Pay special attention to **entry units**.*
 
-- If one particular piece of information is missing, the system automatically replaces the missing entries with
+- **If one particular piece of information is missing**, the system automatically replaces the missing entries with
     the most representative value from the database.
 
 - Typical Ultrasound Measurements are recorded in **4 periods**: around the **17th, 25th, 33rd, 37th** week of gestation,
@@ -411,17 +411,17 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
                                 'Predicted Diagnosis'] = 'LGA'
             overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
                                 'Predicted Diagnosis'] = 'Macrosomia'
-            overall_result.round(2)
             overall_result.rename(columns = {"Predicted Birthweight": "Predicted Birthweight (in grams)",\
                                             "90th percentile BW": "90th percentile BW (in grams)"})
-            overall_result = overall_result.drop("90th percentile BW",axis=1)                              
+            overall_result = overall_result.drop("90th percentile BW",axis=1)  
+            overall_result = overall_result.round(2)                            
             st.dataframe(overall_result)
 
 
-            fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
+            fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight (in grams)"], \
                             color = "Predicted Diagnosis", symbol = "Predicted Diagnosis")
 
-            fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['90th percentile BW'], \
+            fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result["90th percentile BW (in grams)"], \
                             mode = "lines", name  = "LGA Threshold")
 
             fig.add_scatter(x= overall_result["Gestational Age Day"], y=overall_result['Macrosomoia Weight'],\
