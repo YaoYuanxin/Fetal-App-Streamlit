@@ -19,7 +19,7 @@ from keras.models import load_model
 
 
 # -------------- SETTINGS --------------
-page_title = "Fetal BirthWeight Prediction & Overgrowth Diagnosis"
+page_title = "Fetal BirthWeight Prediction & Overgrowth Diagnosis   "
 page_icon = ":chart_with_upwards_trend:"  # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 layout = "centered"
 input_id = datetime.today().strftime("%m%d%Y") + datetime.now().strftime("%H%M%S")
