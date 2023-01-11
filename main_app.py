@@ -36,7 +36,7 @@ st.title(page_title + " " + page_icon)
 
 st.markdown("""
 
-:information_source: **_:Purple[Our Purpose]_:**
+:information_source: **:Purple[Our Purpose]:**
 
 **:red[Macrosomia]** refers to a fetus that has a weight of **over 4000** grams at birth, regardless of how far along in the pregnancy it is. 
 It is sometimes mistaken for **:red["large for gestational age" (LGA)]**, which means an infant's birth weight is in the **top 10% for their 
