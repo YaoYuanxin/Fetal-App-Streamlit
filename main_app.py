@@ -45,7 +45,7 @@ gestational age**. Both macrosomia and LGA increase the risk of health problems 
 As a result, correctly identifying and predicting these conditions is a primary focus of obstetric research,
 in order to implement early intervention or specific medical care during childbirth, which will decrease the risks.
 
-:wrench: **Instructions for Our Tool** 
+:wrench: **_Instructions for Our Tool_** 
 
 - Our tool is powered by Aritifical Neural Networks, developed in the study <*insert parper link*>. Our latest _accuracy_ for predicting
     **:red[LGA]** is **94.7%**, with **66.7%** _true positive rate_; and our latest _accuracy_ for predicting **:red[macrosomia]** is **84%**, 
