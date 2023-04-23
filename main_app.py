@@ -70,7 +70,6 @@ in order to implement early intervention or specific medical care during childbi
 
 
 
-
 # --- USER INPUT FORM
 
 with st.form("User Input (2 Forms)", clear_on_submit=False):
