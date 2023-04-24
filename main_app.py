@@ -19,7 +19,7 @@ from keras.models import load_model
 
 
 # -------------- SETTINGS --------------
-page_title = "Fetal BirthWeight Prediction & Overgrowth Diagnosis   "
+page_title = "Birthweight and Excessive Fetal Growth Prediction   "
 page_icon = ":chart_with_upwards_trend:"  # emojis: https://www.webfx.com/tools/emoji-cheat-sheet/
 layout = "centered"
 input_id = datetime.today().strftime("%m%d%Y") + datetime.now().strftime("%H%M%S")
@@ -38,7 +38,7 @@ st.markdown("""
 
 :information_source: **_:blue[Our Purpose]:_**
 
-**:red[Macrosomia]** refers to a fetus that has a weight of **over 4000** grams at birth, regardless of how far along in the pregnancy it is. 
+**:red[Macrosomia]** refers to the condition when an infant has a weight of **over 4000** grams at birth, regardless of how far along in the pregnancy it is. 
 It is sometimes mistaken for **:red["large for gestational age" (LGA)]**, which means an infant's birth weight is in the **top 10% for their 
 gestational age**. Both macrosomia and LGA increase the risk of health problems for the mother and baby during childbirth.
 
@@ -48,7 +48,7 @@ in order to implement early intervention or specific medical care during childbi
 :wrench: **_Instructions for Our Tool_** 
 
 - Our tool is powered by Aritifical Neural Networks, developed in the study <*insert parper link*>. Our latest _accuracy_ for predicting
-    **:red[LGA]** is **94.7%**, with **66.7%** _true positive rate_; and our latest _accuracy_ for predicting **:red[macrosomia]** is **84%**, 
+    **:red[LGA]** is **94.7%**, with up to **75%** _true positive rate_; and our latest _accuracy_ for predicting **:red[macrosomia]** is **84%**, 
     with **96.8%** _true positive rate_.
 
 - Please fill out the entry forms below according to medical records or to the best of your knowledge. 
@@ -254,7 +254,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
-        with st.spinner("Predicting Fetal Birthweight and Overgrowth..."):
+        with st.spinner("Predicting Birthweights and Conditions..."):
 
             # Open DataBases ON SUBMISSION
 
@@ -378,12 +378,12 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             lga_true.loc[0] = lga_true.loc[0].map({True: "Yes", False: "No"})
             macro_true.loc[0] = macro_true.loc[0].map({True: "Yes", False: "No"})
 
-            st.header("Projected Fetal Birthweight and Overgrowth Diagnosis Report")
+            st.header("Projected Birthweights and LGA/Macrosomia Conditions")
             result = pd.concat([true_pred_df,lga_true,macro_true],axis = 0)
-            result.insert(0, column = "Result", value = ["Predicted Birthweight", "LGA Diagnosis", "Macrosomia Diagnosis"])
+            result.insert(0, column = "Result", value = ["Predicted Birthweight", "LGA Prediction", "Macrosomia Prediction"])
             result.set_index("Result",inplace=True)
             # st.write(result)
-            # st.dataframe(result.loc[["LGA Diagnosis", "Macrosomia Diagnosis"]].style.apply(display_color_df, axis = 1))
+            # st.dataframe(result.loc[["LGA Prediction", "Macrosomia Prediction"]].style.apply(display_color_df, axis = 1))
 
 
             ## Interactive Plot 
@@ -401,20 +401,20 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             overall_result["90th percentile BW"] = overall_result["90th percentile BW"].astype("float64")
             overall_result["Macrosomoia Weight"] = 4000
             overall_result.insert(0,column="Gestational Age Day", value = overall_result.index)
-            overall_result['Predicted Diagnosis'] = ''
-            overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'No'),\
-                                'Predicted Diagnosis'] = 'Healthy'
-            overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'Yes'),\
-                                'Predicted Diagnosis'] = 'Both LGA and Macrosomia'
-            overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'No') & (overall_result['LGA Diagnosis'] == 'Yes'),\
-                                'Predicted Diagnosis'] = 'LGA'
-            overall_result.loc[(overall_result['Macrosomia Diagnosis'] == 'Yes') & (overall_result['LGA Diagnosis'] == 'No'),\
-                                'Predicted Diagnosis'] = 'Macrosomia'                                            
+            overall_result['Predicted Prediction'] = ''
+            overall_result.loc[(overall_result['Macrosomia Prediction'] == 'No') & (overall_result['LGA Prediction'] == 'No'),\
+                                'Predicted Prediction'] = 'Healthy'
+            overall_result.loc[(overall_result['Macrosomia Prediction'] == 'Yes') & (overall_result['LGA Prediction'] == 'Yes'),\
+                                'Predicted Prediction'] = 'Both LGA and Macrosomia'
+            overall_result.loc[(overall_result['Macrosomia Prediction'] == 'No') & (overall_result['LGA Prediction'] == 'Yes'),\
+                                'Predicted Prediction'] = 'LGA'
+            overall_result.loc[(overall_result['Macrosomia Prediction'] == 'Yes') & (overall_result['LGA Prediction'] == 'No'),\
+                                'Predicted Prediction'] = 'Macrosomia'                                            
             st.dataframe(overall_result)
 
 
             fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
-                            color = "Predicted Diagnosis", symbol = "Predicted Diagnosis")
+                            color = "Predicted Prediction", symbol = "Predicted Prediction")
 
             fig.add_scatter(x= overall_result["Gestational Age Day"], y= overall_result["90th percentile BW"], \
                             mode = "lines", name  = "LGA Threshold")
@@ -433,7 +433,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             connection_non_sequential.close()
             connection_sequential.close()
 
-        st.success("Predictions generated! Displaying projected **fetal birthweight** and **overgrowth diagnosis**.")
+        st.success("Predictions generated! Displaying projected **Birthweights** and **Predicted LGA/Macrosomia Conditions**.")
         st.write("Feel free to adjust the entries and re-run the tool to see different predictions.")
 
 
