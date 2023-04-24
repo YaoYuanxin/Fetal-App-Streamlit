@@ -73,9 +73,9 @@ in order to implement early intervention or specific medical care during childbi
 # --- USER INPUT FORM
 
 with st.form("User Input (2 Forms)", clear_on_submit=False):
-    st.header(f" :page_facing_up: Mother's Information:")
+    st.header(f" :page_facing_up: Maternal Baseline Characteristics:")
     def non_sequential_input():
-        with st.expander("**Mother's Basic Information**"):
+        with st.expander("**Basic Information**"):
             wt_before_preg = st.number_input(f"Mother's Weight in **kg** Before Pregnancy ",
                                             min_value = 37.00,max_value=112.00, value=59.18, step=1.0)
             
@@ -120,10 +120,10 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     # st.write(input_df_mom)
 
     # --- FETAL ULTRASOUND MEASUREMENTS
-    st.header(f":bar_chart: Fetal Ultrasound Measurements:")
+    st.header(f":bar_chart: Prenatal Ultrasound Measurements:")
     def sequential_input_17():
         with st.expander(f"Measurements at **~17th Week**"):
-            gadays = st.number_input(f"**Exact Gestational Age Days**",
+            gadays = st.number_input(f"**Exact Gestational Age in in Days**",
                                         min_value = 84, max_value = 157, value = 122, step=1)
 
             bpd_mm = st.number_input(f"**Bipateral Diameter(BPD)** in milimeters",
@@ -149,7 +149,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     #Information at the 25th Week
     def sequential_input_25():
         with st.expander(f"Measurements at **~25th Week**"):
-            gadays = st.number_input("**Exact Gestational Age Days**",
+            gadays = st.number_input("**Exact Gestational Age in Days**",
                                         min_value = 158, max_value = 201, value = 175, step=1)
 
             bpd_mm = st.number_input("**Bipateral Diameter(BPD)** in milimeters",
@@ -175,7 +175,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     #Information at the 33th Week
     def sequential_input_33():
         with st.expander(f"Measurements at **~33rd Week**"):
-            gadays = st.number_input("**Exact Gestational Age Days**",
+            gadays = st.number_input("**Exact Gestational Age in Days**",
                                         min_value = 202, max_value = 246, value = 230, step=1)
 
             bpd_mm = st.number_input("**Bipateral Diameter(BPD)** in milimeters",
@@ -201,7 +201,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     #Information at the 37th Week
     def sequential_input_37():
         with st.expander(f"Measurements at **~37th Week**"):
-            gadays = st.number_input("**Exact Gestational Age Days**",
+            gadays = st.number_input("**Exact Gestational Age in Days**",
                                         min_value = 247, max_value = 276, value = 259, step=1)
 
             bpd_mm = st.number_input("**Bipateral Diameter(BPD)** in milimeters",
@@ -324,7 +324,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             # ax.scatter(no_covariate_no_na_clean.gadays,no_covariate_no_na_clean.efw, c = 'yellowgreen', label = "Original",alpha = 0.7 )
 
 
-            # plt.xlabel("Gestational Age Days")
+            # plt.xlabel("Gestational Age in Days")
             # plt.ylabel("Estimated Fetal Weight")
             # plt.title("Augmented Data vs Original Data (Quadratic Model)")
             # plt.legend()
