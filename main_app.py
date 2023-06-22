@@ -204,7 +204,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             gadays = st.number_input("**Exact Gestational Age in Days**",
                                         min_value = 247, max_value = 276, value = 259, step=1)
 
-            bpd_mm = st.number_input("**Bipateral Diameter(BPD)** in milimeters",
+            bpd_mm = st.number_input("**Bi-parietal Diameter(BPD)** in milimeters",
                                           min_value = 78.00, max_value = 104.00, value = 92.97, step=1.0)
 
             mad_mm = st.number_input("**Middle Abdominal Diameter(MAD)** in milimeters",
