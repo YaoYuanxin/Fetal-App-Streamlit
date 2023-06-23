@@ -123,7 +123,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     st.header(f":bar_chart: Prenatal Ultrasound Measurements:")
     def sequential_input_17():
         with st.expander(f"Measurements at **~17th Week**"):
-            gadays = st.number_input(f"**Exact Gestational Age in in Days**",
+            gadays = st.number_input(f"**Exact Days of Gestation**",
                                         min_value = 84, max_value = 157, value = 122, step=1)
 
             bpd_mm = st.number_input(f"**Bi-parietal Diameter(BPD)** in milimeters",
@@ -149,7 +149,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     #Information at the 25th Week
     def sequential_input_25():
         with st.expander(f"Measurements at **~25th Week**"):
-            gadays = st.number_input("**Exact Gestational Age in Days**",
+            gadays = st.number_input("**Exact Days of Gestation**",
                                         min_value = 158, max_value = 201, value = 175, step=1)
 
             bpd_mm = st.number_input("**Bi-parietal Diameter(BPD)** in milimeters",
@@ -175,7 +175,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     #Information at the 33th Week
     def sequential_input_33():
         with st.expander(f"Measurements at **~33rd Week**"):
-            gadays = st.number_input("**Exact Gestational Age in Days**",
+            gadays = st.number_input("**Exact Days of Gestation**",
                                         min_value = 202, max_value = 246, value = 230, step=1)
 
             bpd_mm = st.number_input("**Bi-parietal Diameter(BPD)** in milimeters",
@@ -201,7 +201,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     #Information at the 37th Week
     def sequential_input_37():
         with st.expander(f"Measurements at **~37th Week**"):
-            gadays = st.number_input("**Exact Gestational Age in Days**",
+            gadays = st.number_input("**Exact Days of Gestation**",
                                         min_value = 247, max_value = 276, value = 259, step=1)
 
             bpd_mm = st.number_input("**Bi-parietal Diameter(BPD)** in milimeters",
