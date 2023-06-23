@@ -126,10 +126,10 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             gadays = st.number_input(f"**Exact Gestational Age in in Days**",
                                         min_value = 84, max_value = 157, value = 122, step=1)
 
-            bpd_mm = st.number_input(f"**Bipateral Diameter(BPD)** in milimeters",
+            bpd_mm = st.number_input(f"**Bi-parietal Diameter(BPD)** in milimeters",
                                         min_value = 20.00, max_value = 62.00, value = 39.86, step=1.0)
 
-            mad_mm = st.number_input("**Middle Abdominal Diameter(MAD)** in milimeters",
+            mad_mm = st.number_input("**Mid Abdominal Diameter(MAD)** in milimeters",
                                          min_value = 20.00, max_value = 64.00, value = 37.91, step=1.0)
 
             fl_mm = st.number_input("**Femur Length(FL)** in milimeters",
@@ -178,10 +178,10 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             gadays = st.number_input("**Exact Gestational Age in Days**",
                                         min_value = 202, max_value = 246, value = 230, step=1)
 
-            bpd_mm = st.number_input("**Bipateral Diameter(BPD)** in milimeters",
+            bpd_mm = st.number_input("**Bi-parietal Diameter(BPD)** in milimeters",
                                         min_value = 66.00, max_value = 98.00, value = 85.95, step=1.0)
 
-            mad_mm = st.number_input("**Middle Abdominal Diameter(MAD)** in milimeters",
+            mad_mm = st.number_input("**Mid Abdominal Diameter(MAD)** in milimeters",
                                         min_value = 66.00, max_value = 111.00, value = 92.40, step=1.0)
 
             fl_mm = st.number_input("**Femur Length(FL)** in milimeters",
@@ -207,7 +207,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             bpd_mm = st.number_input("**Bi-parietal Diameter(BPD)** in milimeters",
                                           min_value = 78.00, max_value = 104.00, value = 92.97, step=1.0)
 
-            mad_mm = st.number_input("**Middle Abdominal Diameter(MAD)** in milimeters",
+            mad_mm = st.number_input("**Mid Abdominal Diameter(MAD)** in milimeters",
                                         min_value = 85.00, max_value = 124.00, value = 104.97, step=1.0)
 
             fl_mm = st.number_input("**Femur Length(FL)** in milimeters",
