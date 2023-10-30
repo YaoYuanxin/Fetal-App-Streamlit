@@ -16,6 +16,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error
 from sklearn import metrics
 from keras.models import load_model
+import openai
+import base64
+
+from langchain.agents import create_csv_agent
+from langchain.llms import OpenAI
 
 
 # -------------- SETTINGS --------------
@@ -36,31 +41,22 @@ st.title(page_title + " " + page_icon)
 
 st.markdown("""
 
-:information_source: **_:blue[Our Purpose]:_**
+:book: **_🔵 [Our Objective]:_**
 
-**:red[Macrosomia]** refers to the condition when an infant has a weight of **over 4000** grams at birth, regardless of how far along in the pregnancy it is. 
-It is sometimes mistaken for **:red["large for gestational age" (LGA)]**, which means an infant's birth weight is in the **top 10% for their 
-gestational age**. Both macrosomia and LGA increase the risk of health problems for the mother and baby during childbirth.
+**:red[Macrosomia]** refers to an infant's weight exceeding **4000 grams** at birth, regardless of the gestational age. This condition is often conflated with **:red["large for gestational age" (LGA)]**, which denotes a birth weight in the **upper 10% for the specific gestational age**. Both Macrosomia and LGA pose increased health risks to the mother and child during childbirth.
 
-As a result, correctly identifying and predicting these conditions is a primary focus of obstetric research,
-in order to implement early intervention or specific medical care during childbirth, which will decrease the risks.
+Accurate prediction of these conditions are crucial objectives in obstetric research. Early and accurate identification enables timely intervention and personalized medical care during childbirth, effectively reducing the associated risks.
 
-:wrench: **_Instructions for Our Tool_** 
+:bulb: **_Instructions for Utilizing Our Tool:_** 
 
-- Our tool is powered by Aritifical Neural Networks, developed in the study <*insert parper link*>. Our latest _accuracy_ for predicting
-    **:red[LGA]** is **94.7%**, with up to **75%** _true positive rate_; and our latest _accuracy_ for predicting **:red[macrosomia]** is **84%**, 
-    with **96.8%** _true positive rate_.
+- Based on advanced Artificial Neural Networks from our study <*insert paper link*>, our tool achieves **94.7% accuracy** in predicting **:red[LGA]**, with a **75% true positive rate**. For **:red[macrosomia]** predictions, it provides **84% accuracy**, and a **96.8% true positive rate**.
 
-- Please fill out the entry forms below according to medical records or to the best of your knowledge. 
-    *Pay special attention to **entry units**.*
+- Ensure the entry forms below accurately reflect the medical records, with particular attention to **entry units**.
 
-- **If one particular piece of information is missing**, the system automatically replaces the missing entries with
-    the most representative value from the database.
+- In case of **missing specific information**, our system substitutes the missing entries with the most representative value from the database.
 
-- Typical Ultrasound Measurements are recorded in **4 periods**: around the **17th, 25th, 33rd, 37th** week of gestation,
-    please enter them accordingly. If more than the aforementioned 4 periods are available, please choose the most accuate 4 measurements
-    over these periods. If the complete records are not available, our system will fill it with the most representative value from
-    the database.
+- Record typical ultrasound measurements during **4 pivotal periods**: the **17th, 25th, 33rd, and 37th** week of gestation. If additional data points are available, prioritize the most accurate four measurements within these periods. Incomplete records will be supplemented by the most representative value from the database, maintaining prediction accuracy.
+
 """)
 
 
@@ -409,9 +405,18 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             overall_result.loc[(overall_result['Macrosomia Prediction'] == 'No') & (overall_result['LGA Prediction'] == 'Yes'),\
                                 'Predicted Prediction'] = 'LGA'
             overall_result.loc[(overall_result['Macrosomia Prediction'] == 'Yes') & (overall_result['LGA Prediction'] == 'No'),\
-                                'Predicted Prediction'] = 'Macrosomia'                                            
+                                'Predicted Prediction'] = 'Macrosomia'
+            overall_result[["Predicted Birthweight","90th percentile BW"]] = overall_result[["Predicted Birthweight","90th percentile BW"]].round(2)
+            overall_result = overall_result.drop(columns='10th percentile BW')                                        
             st.dataframe(overall_result)
 
+            def get_csv_download_link(df, filename="data.csv"):
+                csv = df.to_csv(index=False)
+                b64 = base64.b64encode(csv.encode()).decode()  # Encode to Base64
+                href = f'<a href="data:file/csv;base64,{b64}" download="{filename}">Download CSV</a>'
+                return href
+
+            
 
             fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
                             color = "Predicted Prediction", symbol = "Predicted Prediction")
@@ -432,9 +437,18 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
                     ''')
             connection_non_sequential.close()
             connection_sequential.close()
+            
 
-        st.success("Predictions generated! Displaying projected **Birthweights** and **Predicted LGA/Macrosomia Conditions**.")
-        st.write("Feel free to adjust the entries and re-run the tool to see different predictions.")
+        st.success("Predictions successfully generated! Displaying projected **Birthweights** and **Predicted LGA/Macrosomia Conditions**.")
+        st.markdown(f"""
+            {get_csv_download_link(overall_result, filename="Predictions.csv")}
+            Prediction Report is ready to download. 📊
+            """, unsafe_allow_html=True)
+
+        st.write("Feel free to modify the entries and re-run the analysis to explore different predictive outcomes.")
+
+        
+
 
 
 
