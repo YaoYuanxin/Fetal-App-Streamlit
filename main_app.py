@@ -16,7 +16,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error
 from sklearn import metrics
 from keras.models import load_model
-import openai
 import base64
 
 
