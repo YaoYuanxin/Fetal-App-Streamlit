@@ -19,8 +19,6 @@ from keras.models import load_model
 import openai
 import base64
 
-from langchain.agents import create_csv_agent
-from langchain.llms import OpenAI
 
 
 # -------------- SETTINGS --------------
