@@ -52,7 +52,7 @@ Accurate prediction of these conditions are crucial objectives in obstetric rese
 
 - In case of **missing specific information**, our system substitutes the missing entries with the most representative value from the database.
 
-- Record typical ultrasound measurements during **4 pivotal periods**: the **17th, 25th, 33rd, and 37th** week of gestation. If additional data points are available, prioritize the most accurate four measurements within these periods. Incomplete records will be supplemented by the most representative value from the database, maintaining prediction accuracy.
+- Record typical ultrasound measurements during **4 crucial periods of gestation**: the **17th, 25th, 33rd, and 37th** week of gestation. If additional data points are available, prioritize the most accurate four measurements within these periods. Incomplete records will be supplemented by the most representative value from the database, maintaining prediction accuracy.
 
 """)
 
