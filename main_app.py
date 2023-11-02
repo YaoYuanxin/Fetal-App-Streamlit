@@ -239,19 +239,6 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
 
     # DISPLAY and STORE User Input
-    def df_to_markdown(df1):
-        markdown_text = "## Basic Information\n\n"
-        markdown_text += f"Mother's Weight in kg Before Pregnancy: {df1['Weight_kg'][0]:.2f}\n"
-        markdown_text += f"Mother's Height in cm: {df1['Height_cm'][0]:.2f}\n"
-        markdown_text += f"Number of Previous Pregnancies: {'No previous pregnancy.' if df1['Previous_Pregnancies'][0] == 0 else f'{df1['Previous_Pregnancies'][0]} previous pregnancies.'}\n\n"
-        markdown_text += "## Mother's Health History\n\n"
-        markdown_text += f"Does the mother have High Blood Pressure? {df2['High_Blood_Pressure'][0]}\n"
-        markdown_text += f"Does the mother have Cardiac Diseases? {df2['Cardiac_Diseases'][0]}\n"
-        markdown_text += f"Does the mother have Diabetes? {df2['Diabetes'][0]}\n"
-        markdown_text += f"Does the mother have Renal Disorder? {df2['Renal_Disorder'][0]}\n"
-        markdown_text += f"Is the mother a Regular Smoker? {df2['Regular_Smoker'][0]}"
-        
-        return markdown_text
 
 
 
