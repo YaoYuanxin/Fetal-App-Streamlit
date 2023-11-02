@@ -242,25 +242,25 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     # Convert the single row DataFrame to a Series for easier indexing
     input_series = input_df_mom.iloc[0]
 
-    def format_info(series):
-        markdown_text = "## Basic Information\n\n"
-        markdown_text += f"Mother’s Weight in kg Before Pregnancy: {series['Weight_kg']:.2f}\n"
-        markdown_text += f"Mother’s Height in cm: {series['Height_cm']:.2f}\n"
-        markdown_text += f"Number of Previous Pregnancies: {'No previous pregnancy.' if series['Previous_Pregnancies'] == 0 else f'{series['Previous_Pregnancies']} previous pregnancies.'}\n\n"
-        markdown_text += "## Mother's Health History\n\n"
-        markdown_text += f"Does the mother have High Blood Pressure? {series['High_Blood_Pressure']}\n"
-        markdown_text += f"Does the mother have Cardiac Diseases? {series['Cardiac_Diseases']}\n"
-        markdown_text += f"Does the mother have Diabetes? {series['Diabetes']}\n"
-        markdown_text += f"Does the mother have Renal Disorder? {series['Renal_Disorder']}\n"
-        markdown_text += f"Is the mother a Regular Smoker? {series['Regular_Smoker']}"
+    # def format_info(series):
+    #     markdown_text = "## Basic Information\n\n"
+    #     markdown_text += f"Mother's Weight in kg Before Pregnancy: {series['Weight_kg']:.2f}\n"
+    #     markdown_text += f"Mother's Height in cm: {series['Height_cm']:.2f}\n"
+    #     markdown_text += f"Number of Previous Pregnancies: {'No previous pregnancy.' if series['Previous_Pregnancies'] == 0 else f'{series['Previous_Pregnancies']} previous pregnancies.'}\n\n"
+    #     markdown_text += "## Mother's Health History\n\n"
+    #     markdown_text += f"Does the mother have High Blood Pressure? {series['High_Blood_Pressure']}\n"
+    #     markdown_text += f"Does the mother have Cardiac Diseases? {series['Cardiac_Diseases']}\n"
+    #     markdown_text += f"Does the mother have Diabetes? {series['Diabetes']}\n"
+    #     markdown_text += f"Does the mother have Renal Disorder? {series['Renal_Disorder']}\n"
+    #     markdown_text += f"Is the mother a Regular Smoker? {series['Regular_Smoker']}"
         
-        return markdown_text
+    #     return markdown_text
 
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
         st.markdown("Input submitted. Below is the summary:")
-        st.markdown(format_info(input_series))
+        # st.markdown(format_info(input_series))
         st.dataframe(input_df_mom)
         st.dataframe(sequential_input_all)
         with st.spinner("Predicting Birthweights and Conditions..."):
