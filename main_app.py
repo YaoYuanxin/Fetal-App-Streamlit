@@ -247,6 +247,8 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
+        st.dataframe(input_df_mom)
+        st.dataframe(sequential_input_all)
         with st.spinner("Predicting Birthweights and Conditions..."):
 
             # Open DataBases ON SUBMISSION
