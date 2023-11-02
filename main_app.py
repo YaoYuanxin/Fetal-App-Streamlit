@@ -237,7 +237,6 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     sequential_input_all.insert(0,column="id", value=input_id)
     sequential_input_all.set_index("id", inplace = True)
 
-    sequential_input_all_full = sequential_input_all_full[["gadays","efw"]]
     sequential_input_all_full.insert(0,column="id", value=input_id)
     sequential_input_all_full.set_index("id", inplace = True)
 
