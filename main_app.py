@@ -244,23 +244,24 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     input_series = input_df_mom.iloc[0]
 
     def format_info(series):
-        markdown_text = "### :blue_heart: Basic Information  \n"
-        markdown_text += f"* **Mother's Weight in kg Before Pregnancy:** :dark_blue_circle: {series['wt_before_preg']:.2f} 📏  \n"
-        markdown_text += f"* **Mother's Height in cm:** :dark_blue_circle: {series['height']:.2f} 📏  \n"
+        markdown_text = "### Basic Information  \n"
+        markdown_text += f"* **Mother’s Weight in kg Before Pregnancy:** :blue[`{series['wt_before_preg']:.2f}`] 📏  \n"
+        markdown_text += f"* **Mother’s Height in cm:** :blue[`{series['height']:.2f}`] 📏  \n"
         
         # Handling the conditional expression for number of previous pregnancies
         preg_text = 'No previous pregnancy.' if series['NoPrevPreg'] == 0 else (
             '1 previous pregnancy.' if series['NoPrevPreg'] == 1 else '2 or more previous pregnancies.')
-        markdown_text += f"* **Number of Previous Pregnancies:** :dark_blue_circle: {preg_text} 👶  \n\n"
+        markdown_text += f"* **Number of Previous Pregnancies:** :blue[`{preg_text}`] 👶  \n\n"
         
-        markdown_text += "### :blue_heart: Mother's Health History  \n"
-        markdown_text += f"* **Does the mother have High Blood Pressure?** :dark_blue_circle: {'Yes' if series['hpb'] else 'No'} 🩺  \n"
-        markdown_text += f"* **Does the mother have Cardiac Diseases?** :dark_blue_circle: {'Yes' if series['cardiac'] else 'No'} ❤️  \n"
-        markdown_text += f"* **Does the mother have Diabetes?** :dark_blue_circle: {'Yes' if series['baseline_diabetes'] else 'No'} 🩺  \n"
-        markdown_text += f"* **Does the mother have Renal Disorder?** :dark_blue_circle: {'Yes' if series['renal'] else 'No'} 🩺  \n"
-        markdown_text += f"* **Is the mother a Regular Smoker?** :dark_blue_circle: {'Yes' if series['reg_smoke'] else 'No'} 🚬  \n"
+        markdown_text += "### Mother's Health History  \n"
+        markdown_text += f"* **Does the mother have High Blood Pressure?** :blue[`{'Yes' if series['hpb'] else 'No'}`] 🩺  \n"
+        markdown_text += f"* **Does the mother have Cardiac Diseases?** :blue[`{'Yes' if series['cardiac'] else 'No'}`] ❤️  \n"
+        markdown_text += f"* **Does the mother have Diabetes?** :blue[`{'Yes' if series['baseline_diabetes'] else 'No'}`] 🩺  \n"
+        markdown_text += f"* **Does the mother have Renal Disorder?** :blue[`{'Yes' if series['renal'] else 'No'}`] 🩺  \n"
+        markdown_text += f"* **Is the mother a Regular Smoker?** :blue[`{'Yes' if series['reg_smoke'] else 'No'}`] 🚬  \n"
         
         return markdown_text
+
 
 
 
