@@ -265,7 +265,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
         return markdown_text
 
     def dataframe_to_markdown(df):
-        markdown_text = ":baby::hospital: **The prenatal ultrasound measurements input are as follows:**\n\n"
+        markdown_text = ":baby::hospital: ### The prenatal ultrasound measurements input are as follows:\n\n"
         for index, row in df.iterrows():
             markdown_text += f"- At **{row['gadays']}** gestational days: "
             markdown_text += f"BPD **{row['bpd_mm']}** mm, "
