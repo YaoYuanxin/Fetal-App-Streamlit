@@ -283,8 +283,10 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     if submitted:
         st.markdown("### :white_check_mark: Survey Complete. Here's the information entered in the system: :point_down:")
         st.markdown(format_info(input_series))
+
         st.markdown(dataframe_to_markdown(sequential_input_all_full))
-        st.dataframe(sequential_input_all_full)
+
+        # st.dataframe(sequential_input_all_full)
 
         with st.spinner("### Predicting Birthweights and Conditions..."):
 
