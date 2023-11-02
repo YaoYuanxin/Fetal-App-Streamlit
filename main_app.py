@@ -244,23 +244,24 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     input_series = input_df_mom.iloc[0]
 
     def format_info(series):
-        markdown_text = "<font color='blue'>### Basic Information</font>  \n"
-        markdown_text += f"* <font color='green'>Mother's Weight in kg Before Pregnancy:</font> <font color='red'>{series['wt_before_preg']:.2f}</font> 📏  \n"
-        markdown_text += f"* <font color='green'>Mother's Height in cm:</font> <font color='red'>{series['height']:.2f}</font> 📏  \n"
+        markdown_text = "### :blue_heart: Basic Information  \n"
+        markdown_text += f"* **Mother's Weight in kg Before Pregnancy:** :dark_blue_circle: {series['wt_before_preg']:.2f} 📏  \n"
+        markdown_text += f"* **Mother's Height in cm:** :dark_blue_circle: {series['height']:.2f} 📏  \n"
         
         # Handling the conditional expression for number of previous pregnancies
         preg_text = 'No previous pregnancy.' if series['NoPrevPreg'] == 0 else (
             '1 previous pregnancy.' if series['NoPrevPreg'] == 1 else '2 or more previous pregnancies.')
-        markdown_text += f"* <font color='green'>Number of Previous Pregnancies:</font> <font color='red'>{preg_text}</font> 👶  \n\n"
+        markdown_text += f"* **Number of Previous Pregnancies:** :dark_blue_circle: {preg_text} 👶  \n\n"
         
-        markdown_text += "<font color='blue'>### Mother's Health History</font>  \n"
-        markdown_text += f"* <font color='green'>Does the mother have High Blood Pressure?</font> <font color='red'>{'Yes' if series['hpb'] else 'No'}</font> 🩺  \n"
-        markdown_text += f"* <font color='green'>Does the mother have Cardiac Diseases?</font> <font color='red'>{'Yes' if series['cardiac'] else 'No'}</font> ❤️  \n"
-        markdown_text += f"* <font color='green'>Does the mother have Diabetes?</font> <font color='red'>{'Yes' if series['baseline_diabetes'] else 'No'}</font> 🩺  \n"
-        markdown_text += f"* <font color='green'>Does the mother have Renal Disorder?</font> <font color='red'>{'Yes' if series['renal'] else 'No'}</font> 🩺  \n"
-        markdown_text += f"* <font color='green'>Is the mother a Regular Smoker?</font> <font color='red'>{'Yes' if series['reg_smoke'] else 'No'}</font> 🚬  \n"
+        markdown_text += "### :blue_heart: Mother's Health History  \n"
+        markdown_text += f"* **Does the mother have High Blood Pressure?** :dark_blue_circle: {'Yes' if series['hpb'] else 'No'} 🩺  \n"
+        markdown_text += f"* **Does the mother have Cardiac Diseases?** :dark_blue_circle: {'Yes' if series['cardiac'] else 'No'} ❤️  \n"
+        markdown_text += f"* **Does the mother have Diabetes?** :dark_blue_circle: {'Yes' if series['baseline_diabetes'] else 'No'} 🩺  \n"
+        markdown_text += f"* **Does the mother have Renal Disorder?** :dark_blue_circle: {'Yes' if series['renal'] else 'No'} 🩺  \n"
+        markdown_text += f"* **Is the mother a Regular Smoker?** :dark_blue_circle: {'Yes' if series['reg_smoke'] else 'No'} 🚬  \n"
         
         return markdown_text
+
 
 
 
