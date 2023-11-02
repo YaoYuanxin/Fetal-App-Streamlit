@@ -255,7 +255,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
         
         markdown_text += "### Mother's Health History  \n"
         markdown_text += f"* **Does the mother have High Blood Pressure?** :blue[`{'Yes' if series['hpb'] else 'No'}`] 🩺  \n"
-        markdown_text += f"* **Does the mother have Cardiac Diseases?** :blue[`{'Yes' if series['cardiac'] else 'No'}`] ❤️  \n"
+        markdown_text += f"* **Does the mother have Cardiac Diseases?** :blue[`{'Yes' if series['cardiac'] else 'No'}`] 🩺  \n"
         markdown_text += f"* **Does the mother have Diabetes?** :blue[`{'Yes' if series['baseline_diabetes'] else 'No'}`] 🩺  \n"
         markdown_text += f"* **Does the mother have Renal Disorder?** :blue[`{'Yes' if series['renal'] else 'No'}`] 🩺  \n"
         markdown_text += f"* **Is the mother a Regular Smoker?** :blue[`{'Yes' if series['reg_smoke'] else 'No'}`] 🚬  \n"
@@ -269,7 +269,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
-        st.markdown("Input submitted. Below is the summary:")
+        st.markdown("## :white_check_mark: Survey Complete. Here's the information entered in the system: :point_down:")
         st.markdown(format_info(input_series))
         st.dataframe(input_df_mom)
         st.dataframe(sequential_input_all)
