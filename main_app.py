@@ -239,14 +239,27 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
 
     # DISPLAY and STORE User Input
-    # st.subheader("***Ultrasound Measurement Information***")
-    # st.write("The fetus' ultrasound measurements over 4 gestational age time steps. hmmm")
-    # st.dataframe(sequential_input_all)
+    def df_to_markdown(df1):
+        markdown_text = "## Basic Information\n\n"
+        markdown_text += f"Mother's Weight in kg Before Pregnancy: {df1['Weight_kg'][0]:.2f}\n"
+        markdown_text += f"Mother's Height in cm: {df1['Height_cm'][0]:.2f}\n"
+        markdown_text += f"Number of Previous Pregnancies: {'No previous pregnancy.' if df1['Previous_Pregnancies'][0] == 0 else f'{df1['Previous_Pregnancies'][0]} previous pregnancies.'}\n\n"
+        markdown_text += "## Mother's Health History\n\n"
+        markdown_text += f"Does the mother have High Blood Pressure? {df2['High_Blood_Pressure'][0]}\n"
+        markdown_text += f"Does the mother have Cardiac Diseases? {df2['Cardiac_Diseases'][0]}\n"
+        markdown_text += f"Does the mother have Diabetes? {df2['Diabetes'][0]}\n"
+        markdown_text += f"Does the mother have Renal Disorder? {df2['Renal_Disorder'][0]}\n"
+        markdown_text += f"Is the mother a Regular Smoker? {df2['Regular_Smoker'][0]}"
+        
+        return markdown_text
 
 
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
+        st.markdown("Input submitted. Below is the summary:")
+        # df_to_markdown(input_df_mom)
+        print(type(input_df_mom))
         st.dataframe(input_df_mom)
         st.dataframe(sequential_input_all)
         with st.spinner("Predicting Birthweights and Conditions..."):
@@ -405,8 +418,9 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
                                 'Predicted Prediction'] = 'LGA'
             overall_result.loc[(overall_result['Macrosomia Prediction'] == 'Yes') & (overall_result['LGA Prediction'] == 'No'),\
                                 'Predicted Prediction'] = 'Macrosomia'
-            overall_result[["Predicted Birthweight","90th percentile BW"]] = overall_result[["Predicted Birthweight","90th percentile BW"]].round(2)
-            overall_result = overall_result.drop(columns='10th percentile BW')                                        
+            
+            overall_result = overall_result.drop(columns='10th percentile BW')
+            overall_result[["Predicted Birthweight","90th percentile BW"]] = overall_result[["Predicted Birthweight","90th percentile BW"]].round(2)                                        
             st.dataframe(overall_result)
 
             def get_csv_download_link(df, filename="data.csv"):
