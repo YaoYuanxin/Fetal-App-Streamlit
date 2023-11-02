@@ -243,22 +243,24 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     input_series = input_df_mom.iloc[0]
 
     def format_info(series):
-        markdown_text = "## Basic Information\n\n"
-        markdown_text += f"Mother’s Weight in kg Before Pregnancy: {series['wt_before_preg']:.2f}\n"
-        markdown_text += f"Mother’s Height in cm: {series['height']:.2f}\n"
+        markdown_text = "### Basic Information  \n"
+        markdown_text += f"* Mother's Weight in kg Before Pregnancy: {series['wt_before_preg']:.2f}  \n"
+        markdown_text += f"* Mother's Height in cm: {series['height']:.2f}  \n"
         
-        # Handling the conditional expression outside the f-string
-        preg_text = 'No previous pregnancy.' if series['NoPrevPreg'] == 0 else f"{series['NoPrevPreg']} previous pregnancies."
-        markdown_text += f"Number of Previous Pregnancies: {preg_text}\n\n"
+        # Handling the conditional expression for number of previous pregnancies
+        preg_text = 'No previous pregnancy.' if series['NoPrevPreg'] == 0 else (
+            '1 previous pregnancy.' if series['NoPrevPreg'] == 1 else '2 or more previous pregnancies.')
+        markdown_text += f"* Number of Previous Pregnancies: {preg_text}  \n\n"
         
-        markdown_text += "## Mother's Health History\n\n"
-        markdown_text += f"Does the mother have High Blood Pressure? {series['hpb']}\n"
-        markdown_text += f"Does the mother have Cardiac Diseases? {series['cardiac']}\n"
-        markdown_text += f"Does the mother have Diabetes? {series['baseline_diabetes']}\n"
-        markdown_text += f"Does the mother have Renal Disorder? {series['renal']}\n"
-        markdown_text += f"Is the mother a Regular Smoker? {series['reg_smoke']}"
+        markdown_text += "### Mother's Health History  \n"
+        markdown_text += f"* Does the mother have High Blood Pressure? {'Yes' if series['hpb'] else 'No'}  \n"
+        markdown_text += f"* Does the mother have Cardiac Diseases? {'Yes' if series['cardiac'] else 'No'}  \n"
+        markdown_text += f"* Does the mother have Diabetes? {'Yes' if series['baseline_diabetes'] else 'No'}  \n"
+        markdown_text += f"* Does the mother have Renal Disorder? {'Yes' if series['renal'] else 'No'}  \n"
+        markdown_text += f"* Is the mother a Regular Smoker? {'Yes' if series['reg_smoke'] else 'No'}  \n"
         
         return markdown_text
+
 
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
