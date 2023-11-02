@@ -231,7 +231,8 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     
     gaweeks = [input_id+ str(17), input_id + str(25), input_id + str(33), input_id + str(37)]
     sequential_input_all.insert(0, column = 'Gestational Week', value = gaweeks)
-    sequential_input_all.set_index("Gestational Week", inplace=True)    
+    sequential_input_all.set_index("Gestational Week", inplace=True) 
+    sequential_input_all_full = sequential_input_all
     sequential_input_all = sequential_input_all[["gadays","efw"]]
     sequential_input_all.insert(0,column="id", value=input_id)
     sequential_input_all.set_index("id", inplace = True)
@@ -243,23 +244,24 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     input_series = input_df_mom.iloc[0]
 
     def format_info(series):
-        markdown_text = "### Basic Information  \n"
-        markdown_text += f"* Mother's Weight in kg Before Pregnancy: {series['wt_before_preg']:.2f}  \n"
-        markdown_text += f"* Mother's Height in cm: {series['height']:.2f}  \n"
+        markdown_text = "<font color='blue'>### Basic Information</font>  \n"
+        markdown_text += f"* <font color='green'>Mother's Weight in kg Before Pregnancy:</font> <font color='red'>{series['wt_before_preg']:.2f}</font> 📏  \n"
+        markdown_text += f"* <font color='green'>Mother's Height in cm:</font> <font color='red'>{series['height']:.2f}</font> 📏  \n"
         
         # Handling the conditional expression for number of previous pregnancies
         preg_text = 'No previous pregnancy.' if series['NoPrevPreg'] == 0 else (
             '1 previous pregnancy.' if series['NoPrevPreg'] == 1 else '2 or more previous pregnancies.')
-        markdown_text += f"* Number of Previous Pregnancies: {preg_text}  \n\n"
+        markdown_text += f"* <font color='green'>Number of Previous Pregnancies:</font> <font color='red'>{preg_text}</font> 👶  \n\n"
         
-        markdown_text += "### Mother's Health History  \n"
-        markdown_text += f"* Does the mother have High Blood Pressure? {'Yes' if series['hpb'] else 'No'}  \n"
-        markdown_text += f"* Does the mother have Cardiac Diseases? {'Yes' if series['cardiac'] else 'No'}  \n"
-        markdown_text += f"* Does the mother have Diabetes? {'Yes' if series['baseline_diabetes'] else 'No'}  \n"
-        markdown_text += f"* Does the mother have Renal Disorder? {'Yes' if series['renal'] else 'No'}  \n"
-        markdown_text += f"* Is the mother a Regular Smoker? {'Yes' if series['reg_smoke'] else 'No'}  \n"
+        markdown_text += "<font color='blue'>### Mother's Health History</font>  \n"
+        markdown_text += f"* <font color='green'>Does the mother have High Blood Pressure?</font> <font color='red'>{'Yes' if series['hpb'] else 'No'}</font> 🩺  \n"
+        markdown_text += f"* <font color='green'>Does the mother have Cardiac Diseases?</font> <font color='red'>{'Yes' if series['cardiac'] else 'No'}</font> ❤️  \n"
+        markdown_text += f"* <font color='green'>Does the mother have Diabetes?</font> <font color='red'>{'Yes' if series['baseline_diabetes'] else 'No'}</font> 🩺  \n"
+        markdown_text += f"* <font color='green'>Does the mother have Renal Disorder?</font> <font color='red'>{'Yes' if series['renal'] else 'No'}</font> 🩺  \n"
+        markdown_text += f"* <font color='green'>Is the mother a Regular Smoker?</font> <font color='red'>{'Yes' if series['reg_smoke'] else 'No'}</font> 🚬  \n"
         
         return markdown_text
+
 
 
 
