@@ -483,7 +483,11 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             Prediction Report is ready to download. 📊
             """, unsafe_allow_html=True)
 
-        st.write("Feel free to modify the entries and re-run the analysis to explore different predictive outcomes.")
+        st.write(":recycle: To regenerate or revise calculations, the user can either:")
+        st.write("1. **Modify the Entries:** change the input parameters directly and submit the entires again.")
+        st.write("2. **Refresh the Page:** Simpler refresh the page and restart the app.")
+        st.write(":floppy_disk: Make sure to save all results before restarting.")
+
 
         
 
