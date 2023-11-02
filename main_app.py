@@ -237,6 +237,9 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     sequential_input_all.insert(0,column="id", value=input_id)
     sequential_input_all.set_index("id", inplace = True)
 
+    sequential_input_all_full = sequential_input_all_full[["gadays","efw"]]
+    sequential_input_all_full.insert(0,column="id", value=input_id)
+    sequential_input_all_full.set_index("id", inplace = True)
 
 
     # DISPLAY and STORE User Input
@@ -269,11 +272,11 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
     submitted = st.form_submit_button("**Confirm Entries and Generate Results**")
     if submitted:
-        st.markdown("## :white_check_mark: Survey Complete. Here's the information entered in the system: :point_down:")
+        st.markdown("### :white_check_mark: Survey Complete. Here's the information entered in the system: :point_down:")
         st.markdown(format_info(input_series))
-        st.dataframe(input_df_mom)
-        st.dataframe(sequential_input_all)
-        with st.spinner("Predicting Birthweights and Conditions..."):
+        st.dataframe(sequential_input_all_full)
+
+        with st.spinner("### Predicting Birthweights and Conditions..."):
 
             # Open DataBases ON SUBMISSION
 
