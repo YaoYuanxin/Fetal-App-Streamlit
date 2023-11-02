@@ -247,8 +247,8 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
 
     def format_info(series):
         markdown_text = "### Basic Information  \n"
-        markdown_text += f"* **Mother’s Weight in kg Before Pregnancy:** :blue[`{series['wt_before_preg']:.2f}`] 📏  \n"
-        markdown_text += f"* **Mother’s Height in cm:** :blue[`{series['height']:.2f}`] 📏  \n"
+        markdown_text += f"* **Mother's Weight in kg Before Pregnancy:** :blue[`{series['wt_before_preg']:.2f} kg`] 📏  \n"
+        markdown_text += f"* **Mother's Height in cm:** :blue[`{series['height']:.2f} cm`] 📏  \n"
         
         # Handling the conditional expression for number of previous pregnancies
         preg_text = 'No previous pregnancy.' if series['NoPrevPreg'] == 0 else (
@@ -264,6 +264,16 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
         
         return markdown_text
 
+    def dataframe_to_markdown(df):
+        markdown_text = "The prenatal ultrasound measurements input are as follows:\n"
+        for index, row in df.iterrows():
+            markdown_text += f"- At {row['gadays']} gestational days: "
+            markdown_text += f"BPD {row['bpd_mm']} mm, "
+            markdown_text += f"MAD {row['mad_mm']} mm, "
+            markdown_text += f"FL {row['fl_mm']} mm, "
+            markdown_text += f"EFW {row['efw']} g.\n"
+        
+        return markdown_text
 
 
 
@@ -273,6 +283,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
     if submitted:
         st.markdown("### :white_check_mark: Survey Complete. Here's the information entered in the system: :point_down:")
         st.markdown(format_info(input_series))
+        st.markdown(dataframe_to_markdown(sequential_input_all_full))
         st.dataframe(sequential_input_all_full)
 
         with st.spinner("### Predicting Birthweights and Conditions..."):
