@@ -40,7 +40,7 @@ st.markdown("""
 
 :book: **_🔵 [Our Objective]:_**
 
-**:red[Macrosomia]** refers to an infant's weight exceeding **4000 grams** at birth, regardless of the gestational age. This condition is often conflated with **:red["large for gestational age" (LGA)]**, which denotes a birth weight in the **upper 10% for the specific gestational age**. Both Macrosomia and LGA pose increased health risks to the mother and child during childbirth.
+**:red[Macrosomia test]** refers to an infant's weight exceeding **4000 grams** at birth, regardless of the gestational age. This condition is often conflated with **:red["large for gestational age" (LGA)]**, which denotes a birth weight in the **upper 10% for the specific gestational age**. Both Macrosomia and LGA pose increased health risks to the mother and child during childbirth.
 
 Accurate prediction of these conditions are crucial objectives in obstetric research. Early and accurate identification enables timely intervention and personalized medical care during childbirth, effectively reducing the associated risks.
 
