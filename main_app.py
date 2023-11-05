@@ -434,15 +434,15 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             overall_result["90th percentile BW"] = overall_result["90th percentile BW"].astype("float64")
             overall_result["Macrosomoia Weight"] = 4000
             overall_result.insert(0,column="Gestational Age Day", value = overall_result.index)
-            overall_result['Predicted Prediction'] = ''
+            overall_result['Predicted Condition'] = ''
             overall_result.loc[(overall_result['Macrosomia Prediction'] == 'No') & (overall_result['LGA Prediction'] == 'No'),\
-                                'Predicted Prediction'] = 'Healthy'
+                                'Predicted Condition'] = 'Healthy'
             overall_result.loc[(overall_result['Macrosomia Prediction'] == 'Yes') & (overall_result['LGA Prediction'] == 'Yes'),\
-                                'Predicted Prediction'] = 'Both LGA and Macrosomia'
+                                'Predicted Condition'] = 'Both LGA and Macrosomia'
             overall_result.loc[(overall_result['Macrosomia Prediction'] == 'No') & (overall_result['LGA Prediction'] == 'Yes'),\
-                                'Predicted Prediction'] = 'LGA'
+                                'Predicted Condition'] = 'LGA'
             overall_result.loc[(overall_result['Macrosomia Prediction'] == 'Yes') & (overall_result['LGA Prediction'] == 'No'),\
-                                'Predicted Prediction'] = 'Macrosomia'
+                                'Predicted Condition'] = 'Macrosomia'
             
             overall_result = overall_result.drop(columns='10th percentile BW')
             overall_result[["Predicted Birthweight","90th percentile BW"]] = overall_result[["Predicted Birthweight","90th percentile BW"]].round(2)                                        
@@ -457,7 +457,7 @@ with st.form("User Input (2 Forms)", clear_on_submit=False):
             
 
             fig = px.scatter(overall_result, x= "Gestational Age Day", y=overall_result["Predicted Birthweight"], \
-                            color = "Predicted Prediction", symbol = "Predicted Prediction")
+                            color = "Predicted Condition", symbol = "Predicted Condition")
 
             fig.add_scatter(x= overall_result["Gestational Age Day"], y= overall_result["90th percentile BW"], \
                             mode = "lines", name  = "LGA Threshold")
